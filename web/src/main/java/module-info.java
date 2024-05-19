@@ -1,9 +1,15 @@
+import movies.api.MoviesSubSystem;
+import shows.api.ShowsSubSystem;
+import users.api.UsersSubSystem;
+
 module web {
     requires movies;
     requires shows;
+    requires users;
 
-    uses shows.api.ShowsSystem;
-    uses movies.api.MoviesSystem;
+    uses UsersSubSystem;
+    uses ShowsSubSystem;
+    uses MoviesSubSystem;
 
     //TODO: ser mas fino con el opens
     opens spring.main;

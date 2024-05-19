@@ -1,28 +1,37 @@
 package spring.main;
 
-import movies.api.MoviesSystem;
+import movies.api.MoviesSubSystem;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import shows.api.ShowsSystem;
+import shows.api.ShowsSubSystem;
+import users.api.UsersSubSystem;
 
 import java.util.ServiceLoader;
 
 @Configuration
 public class AppConfiguration {
-
-    // this secret should not be here
-//    private static final String SECRET = "nXXh3Xjr2T0ofFilg3kw8BwDEyHmS6OIe4cjWUm2Sm0=";
-
     @Bean
     @Profile("default")
-    public MoviesSystem createMovies() {
-        return ServiceLoader.load(MoviesSystem.class).findFirst().get();
+    public MoviesSubSystem createMovies() {
+        return moduleFacadeLoader(MoviesSubSystem.class);
     }
 
     @Bean
     @Profile("default")
-    public ShowsSystem createShows() {
-        return ServiceLoader.load(ShowsSystem.class).findFirst().get();
+    public ShowsSubSystem createShows() {
+        return moduleFacadeLoader(ShowsSubSystem.class);
+    }
+
+    @Bean
+    @Profile("default")
+    public UsersSubSystem createUsers() {
+        return moduleFacadeLoader(UsersSubSystem.class);
+    }
+
+    private <T> T moduleFacadeLoader(Class<T> clazz) {
+        return ServiceLoader.load(clazz)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Modules facade services could not be loaded"));
     }
 }

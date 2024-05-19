@@ -10,31 +10,28 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
-public class Shows implements ShowsSystem {
+public class Shows implements ShowsSubSystem {
     static final int MINUTES_TO_KEEP_RESERVATION = 5;
     static final String MOVIE_ID_DOES_NOT_EXISTS = "Movie ID not found";
     static final String SHOW_TIME_ID_NOT_EXISTS = "Show ID not found";
-    static final String USER_ID_NOT_EXISTS = "User not registered";
+    static final String BUYER_ID_NOT_EXISTS = "User not registered";
     static final String THEATER_ID_DOES_NOT_EXISTS = "Theater id not found";
     private final EntityManagerFactory emf;
     private final CreditCardPaymentProvider paymentGateway;
-    private final EmailProvider emailProvider;
     private final DateTimeProvider dateTimeProvider;
     private EntityManager em;
 
     public Shows(EntityManagerFactory emf,
                  CreditCardPaymentProvider paymentGateway,
-                 EmailProvider emailProvider, DateTimeProvider provider) {
+                 DateTimeProvider provider) {
         this.emf = emf;
         this.paymentGateway = paymentGateway;
-        this.emailProvider = emailProvider;
         this.dateTimeProvider = provider;
     }
 
     public Shows(EntityManagerFactory emf,
-                 CreditCardPaymentProvider paymentGateway,
-                 EmailProvider emailProvider) {
-        this(emf, paymentGateway, emailProvider, DateTimeProvider.create());
+                 CreditCardPaymentProvider paymentGateway) {
+        this(emf, paymentGateway, DateTimeProvider.create());
     }
 
     @Override
@@ -81,11 +78,11 @@ public class Shows implements ShowsSystem {
     }
 
     @Override
-    public DetailedShowInfo reserve(Long userId, Long showTimeId,
+    public DetailedShowInfo reserve(Long buyerId, Long showTimeId,
                                     Set<Integer> selectedSeats) {
         return inTx(em -> {
             ShowTime showTime = showTimeBy(showTimeId);
-            var user = userBy(userId);
+            var user = buyerBy(buyerId);
             showTime.reserveSeatsFor(user, selectedSeats,
                     this.dateTimeProvider.now().plusMinutes(MINUTES_TO_KEEP_RESERVATION));
             return showTime.toDetailedInfo();
@@ -98,28 +95,14 @@ public class Shows implements ShowsSystem {
                       String secturityCode) {
         return inTx(em -> {
             ShowTime showTime = showTimeBy(showTimeId);
-            var user = userBy(userId);
-            Ticket ticket = new Cashier(this.paymentGateway).paySeatsFor(selectedSeats,
+            var user = buyerBy(userId);
+            return new Cashier(this.paymentGateway).paySeatsFor(selectedSeats,
                     showTime,
                     user,
                     Creditcard.of(creditCardNumber, expirationDate, secturityCode));
-            sendNewSaleEmailToTheUser(selectedSeats, showTime, user,
-                    ticket.total());
-            return ticket;
+            //TODO: implement observer to notify Notifications module and Users for points
         });
     }
-
-
-    private void sendNewSaleEmailToTheUser(Set<Integer> selectedSeats,
-                                           ShowTime showTime, Buyer user, float totalAmount) {
-        var emailTemplate = new NewSaleEmailTemplate(totalAmount,
-                user.userName(), selectedSeats, showTime.movieName(),
-                showTime.startDateTime());
-
-        this.emailProvider.send(user.email(), emailTemplate.subject(),
-                emailTemplate.body());
-    }
-
 
     private Theater theatreBy(Long theatreId) {
         return findByIdOrThrows(Theater.class, theatreId, THEATER_ID_DOES_NOT_EXISTS);
@@ -129,8 +112,8 @@ public class Shows implements ShowsSystem {
         return findByIdOrThrows(Movie.class, movieId, MOVIE_ID_DOES_NOT_EXISTS);
     }
 
-    private Buyer userBy(Long userId) {
-        return findByIdOrThrows(Buyer.class, userId, USER_ID_NOT_EXISTS);
+    private Buyer buyerBy(Long buyerId) {
+        return findByIdOrThrows(Buyer.class, buyerId, BUYER_ID_NOT_EXISTS);
     }
 
     private ShowTime showTimeBy(Long id) {

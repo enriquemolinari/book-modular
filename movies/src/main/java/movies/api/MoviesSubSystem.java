@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
-public interface MoviesSystem {
+public interface MoviesSubSystem {
 
     List<MovieInfo> pagedMoviesSortedByName(int pageNumber);
 
@@ -22,7 +22,7 @@ public interface MoviesSystem {
 
     MovieInfo addDirectorToMovie(Long movieId, String name,
                                  String surname, String email);
-    
+
     UserMovieRate rateMovieBy(Long userId, Long idMovie, int rateValue,
                               String comment);
 

@@ -5,7 +5,7 @@ import java.time.YearMonth;
 import java.util.List;
 import java.util.Set;
 
-public interface ShowsSystem {
+public interface ShowsSubSystem {
 
     List<MovieShows> showsUntil(LocalDateTime untilTo);
 

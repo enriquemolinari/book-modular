@@ -1,7 +1,7 @@
-package shows.main;
+package users.main;
 
 public class Main {
     public static void main(String[] args) {
-        ShowsSubSystemStartUp.provider();
+        UsersSubSystemStartUp.provider();
     }
 }

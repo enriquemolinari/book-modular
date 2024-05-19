@@ -11,6 +11,8 @@
         <module>shows</module>
         <module>movies</module>
         <module>web</module>
+        <module>users</module>
+        <module>notifications</module>
     </modules>
 
     <properties>

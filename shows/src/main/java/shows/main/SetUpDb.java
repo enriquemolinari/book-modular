@@ -26,11 +26,11 @@ public class SetUpDb {
             var schoolMovie = new Movie(1L, "Rock in the School", 109,
                     LocalDate.now(), Set.of("COMEDY", "ACTION"));
 
-            var eu = new Buyer(1L, "emolinari", "enrique.molinari@gmail.com");
+            var eu = new Buyer(1L);
             em.persist(eu);
 
-            var nu = new Buyer(2L, "nico", "nico@mymovies.com");
-            var lu = new Buyer(3L, "lucia", "lu@mymovies.com");
+            var nu = new Buyer(2L);
+            var lu = new Buyer(3L);
 
             em.persist(nu);
             em.persist(lu);
@@ -46,7 +46,7 @@ public class SetUpDb {
             em.persist(fishMovie);
             em.flush();
 
-            var ju = new Buyer(4L, "jsimini", "jsimini@mymovies.com");
+            var ju = new Buyer(4L);
             em.persist(ju);
             em.flush();
 

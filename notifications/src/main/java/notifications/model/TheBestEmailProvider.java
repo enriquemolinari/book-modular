@@ -1,4 +1,4 @@
-package shows.model;
+package notifications.model;
 
 public class TheBestEmailProvider implements EmailProvider {
 

@@ -48,7 +48,7 @@ class Sale {
         this.seatsSold = seatsSold;
         this.salesDate = LocalDateTime.now();
         this.pointsWon = pointsWon;
-        buyerThatPurchased.newPurchase(this, pointsWon);
+        buyerThatPurchased.newPurchase(this);
     }
 
     public static Ticket registerNewSaleFor(Buyer buyerThatPurchased,
@@ -78,8 +78,11 @@ class Sale {
         ShowSeat first = this.seatsSold.stream().findFirst().get();
         String movieName = first.showMovieName();
         String startTime = first.showStartTime();
-        return new Ticket(total, pointsWon, formattedSalesDate(),
-                purchaser.userName(), confirmedSeatNumbers(),
-                movieName, startTime);
+        return new Ticket(total,
+                pointsWon,
+                formattedSalesDate(),
+                confirmedSeatNumbers(),
+                movieName,
+                startTime);
     }
 }

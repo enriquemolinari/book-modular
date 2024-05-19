@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
-public class Movies implements MoviesSystem {
+public class Movies implements MoviesSubSystem {
     static final String MOVIE_ID_DOES_NOT_EXISTS = "Movie ID not found";
     static final String USER_ID_NOT_EXISTS = "User not registered";
     static final String USER_HAS_ALREADY_RATE = "The user has already rate the movie";

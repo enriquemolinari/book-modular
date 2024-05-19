@@ -1,5 +1,5 @@
-import movies.api.MoviesSystem;
-import movies.main.MoviesSystemStartUp;
+import movies.api.MoviesSubSystem;
+import movies.main.MoviesSubSystemStartUp;
 
 module movies {
     requires jakarta.persistence;
@@ -7,6 +7,6 @@ module movies {
     requires org.hibernate.orm.core;
     opens movies.model to org.hibernate.orm.core;
 
-    provides MoviesSystem with MoviesSystemStartUp;
+    provides MoviesSubSystem with MoviesSubSystemStartUp;
     exports movies.api;
 }
