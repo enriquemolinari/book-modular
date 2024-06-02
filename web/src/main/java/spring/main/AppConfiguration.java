@@ -1,5 +1,6 @@
 package spring.main;
 
+import common.constants.Environment;
 import movies.api.MoviesSubSystem;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,23 +11,21 @@ import users.api.UsersSubSystem;
 import static spring.main.ModuleFacadeLoader.moduleFacadeLoader;
 
 @Configuration
-@Profile(AppConfiguration.ENVIRONMENT)
+@Profile(Environment.ENVIRONMENT_DEFAULT)
 public class AppConfiguration {
-
-    public static final String ENVIRONMENT = "default";
 
     @Bean
     public MoviesSubSystem createMovies() {
-        return moduleFacadeLoader(MoviesSubSystem.class, ENVIRONMENT);
+        return moduleFacadeLoader(MoviesSubSystem.class);
     }
 
     @Bean
     public ShowsSubSystem createShows() {
-        return moduleFacadeLoader(ShowsSubSystem.class, ENVIRONMENT);
+        return moduleFacadeLoader(ShowsSubSystem.class);
     }
 
     @Bean
     public UsersSubSystem createUsers() {
-        return moduleFacadeLoader(UsersSubSystem.class, ENVIRONMENT);
+        return moduleFacadeLoader(UsersSubSystem.class);
     }
 }

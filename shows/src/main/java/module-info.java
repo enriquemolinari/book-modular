@@ -2,6 +2,8 @@ import shows.api.ShowsSubSystem;
 import shows.main.ShowsSubSystemStartUp;
 
 module shows {
+    requires common;
+
     requires jakarta.persistence;
     requires lombok;
     requires org.hibernate.orm.core;

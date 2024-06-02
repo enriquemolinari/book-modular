@@ -21,9 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest(classes = Main.class, webEnvironment = WebEnvironment.DEFINED_PORT)
-// define a test profile to create the in memory database and sample data
-// see spring.main.AppConfiguration and spring.main.PersistenceConfiguration
-// classes
 @ActiveProfiles(value = "test")
 public class CinemaSystemControllerTest {
 

@@ -1,8 +1,10 @@
 package shows.main;
 
+import common.constants.Environment;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import shows.api.ShowsSubSystem;
+import shows.model.CreditCardPaymentProvider;
 import shows.model.PleasePayPaymentProvider;
 import shows.model.Shows;
 
@@ -10,26 +12,35 @@ import static shows.main.PersistenceUnit.DERBY_CLIENT_SHOWS_MODULE;
 import static shows.main.PersistenceUnit.DERBY_EMBEDDED_SHOWS_MODULE;
 
 public class ShowsSubSystemStartUp {
-    static final String ENVIRONMENT_PROPERTY_NAME = "env";
-    static final String ENVIRONMENT_PROD = "prod";
 
     public static ShowsSubSystem provider() {
-        String environment = System.getProperty(ENVIRONMENT_PROPERTY_NAME);
-        //TODO: read environment for modules
-        //TODO: usar el fake de payment en environment != prod,
-        // pero primero me traigo los test del modulo
-
-        // un utils module? constants y utils?
-        EntityManagerFactory emf;
-        if (environment.equals(ENVIRONMENT_PROD)) {
-            emf = Persistence
-                    .createEntityManagerFactory(DERBY_CLIENT_SHOWS_MODULE);
-        } else {
-            emf = Persistence
-                    .createEntityManagerFactory(DERBY_EMBEDDED_SHOWS_MODULE);
+        String environment = System.getProperty(Environment.ENVIRONMENT_PROPERTY_NAME);
+        if (isPROD(environment)) {
+            var emf = createEntityManagerFactory(DERBY_CLIENT_SHOWS_MODULE);
+            return showsSubsystem(emf, new PleasePayPaymentProvider());
         }
+        var emf = createEntityManagerFactory(DERBY_EMBEDDED_SHOWS_MODULE);
+        setUpSampleDatabase(emf);
+        CreditCardPaymentProvider doNothingPaymentProvider =
+                (creditCardNumber, expire, securityCode, totalAmount) -> {
+                };
+        return showsSubsystem(emf, doNothingPaymentProvider);
+    }
+
+    private static boolean isPROD(String environment) {
+        return environment.equals(Environment.ENVIRONMENT_PROD);
+    }
+
+    private static Shows showsSubsystem(EntityManagerFactory emf, CreditCardPaymentProvider paymentProvider) {
+        return new Shows(emf, paymentProvider);
+    }
+
+    private static void setUpSampleDatabase(EntityManagerFactory emf) {
         new SetUpDb(emf).createSchemaAndPopulateSampleData();
-        return new Shows(emf,
-                new PleasePayPaymentProvider());
+    }
+
+    private static EntityManagerFactory createEntityManagerFactory(String persistenceUnitName) {
+        return Persistence
+                .createEntityManagerFactory(persistenceUnitName);
     }
 }

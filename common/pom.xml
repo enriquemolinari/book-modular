@@ -8,8 +8,7 @@
         <artifactId>cinema</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-
-    <artifactId>notifications</artifactId>
+    <artifactId>common</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -17,13 +16,4 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <dependencies>
-        <!-- tests -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.10.2</version>
-        </dependency>
-
-    </dependencies>
 </project>

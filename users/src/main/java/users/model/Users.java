@@ -14,27 +14,22 @@ public class Users implements UsersSubSystem {
     public static final String USER_OR_PASSWORD_ERROR = "Invalid username or password";
     static final String USER_NAME_ALREADY_EXISTS = "userName already exists";
     static final String USER_ID_NOT_EXISTS = "User not registered";
-    static final String PAGE_NUMBER_MUST_BE_GREATER_THAN_ZERO = "page number must be greater than zero";
     private static final int NUMBER_OF_RETRIES = 2;
-    private static final int DEFAULT_PAGE_SIZE = 20;
     private final EntityManagerFactory emf;
-    private final int pageSize;
     private final Token token;
     private final DateTimeProvider dateTimeProvider;
     private EntityManager em;
 
     public Users(EntityManagerFactory emf,
-                 Token token, DateTimeProvider provider,
-                 int pageSize) {
+                 Token token, DateTimeProvider provider) {
         this.emf = emf;
         this.token = token;
         this.dateTimeProvider = provider;
-        this.pageSize = pageSize;
     }
 
     public Users(EntityManagerFactory emf,
                  Token token) {
-        this(emf, token, DateTimeProvider.create(), DEFAULT_PAGE_SIZE);
+        this(emf, token, DateTimeProvider.create());
     }
 
     @Override
@@ -90,7 +85,7 @@ public class Users implements UsersSubSystem {
         }
         return e;
     }
-    
+
     private <T> T inTx(Function<EntityManager, T> toExecute) {
         em = emf.createEntityManager();
         var tx = em.getTransaction();

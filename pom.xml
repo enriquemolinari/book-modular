@@ -13,6 +13,7 @@
         <module>web</module>
         <module>users</module>
         <module>notifications</module>
+        <module>common</module>
     </modules>
 
     <properties>
