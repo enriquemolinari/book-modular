@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import shows.api.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
@@ -101,6 +102,20 @@ public class Shows implements ShowsSubSystem {
                     user,
                     Creditcard.of(creditCardNumber, expirationDate, secturityCode));
             //TODO: implement observer to notify Notifications module and Users for points
+        });
+    }
+
+    Long addNewMovie(Long id, String name, int duration, LocalDate releaseDate, Set<String> genres) {
+        return inTx(em -> {
+            em.persist(new Movie(id, name, duration, releaseDate, genres));
+            return id;
+        });
+    }
+
+    Long addNewBuyer(Long id) {
+        return inTx(em -> {
+            em.persist(new Buyer(id));
+            return id;
         });
     }
 

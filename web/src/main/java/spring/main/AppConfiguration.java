@@ -7,31 +7,26 @@ import org.springframework.context.annotation.Profile;
 import shows.api.ShowsSubSystem;
 import users.api.UsersSubSystem;
 
-import java.util.ServiceLoader;
+import static spring.main.ModuleFacadeLoader.moduleFacadeLoader;
 
 @Configuration
+@Profile(AppConfiguration.ENVIRONMENT)
 public class AppConfiguration {
+
+    public static final String ENVIRONMENT = "default";
+
     @Bean
-    @Profile("default")
     public MoviesSubSystem createMovies() {
-        return moduleFacadeLoader(MoviesSubSystem.class);
+        return moduleFacadeLoader(MoviesSubSystem.class, ENVIRONMENT);
     }
 
     @Bean
-    @Profile("default")
     public ShowsSubSystem createShows() {
-        return moduleFacadeLoader(ShowsSubSystem.class);
+        return moduleFacadeLoader(ShowsSubSystem.class, ENVIRONMENT);
     }
 
     @Bean
-    @Profile("default")
     public UsersSubSystem createUsers() {
-        return moduleFacadeLoader(UsersSubSystem.class);
-    }
-
-    private <T> T moduleFacadeLoader(Class<T> clazz) {
-        return ServiceLoader.load(clazz)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Modules facade services could not be loaded"));
+        return moduleFacadeLoader(UsersSubSystem.class, ENVIRONMENT);
     }
 }

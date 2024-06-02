@@ -188,6 +188,13 @@ public class Movies implements MoviesSubSystem {
         });
     }
 
+    Long addNewUser(Long id, String username) {
+        return inTx(em -> {
+            em.persist(new User(id, username));
+            return id;
+        });
+    }
+
     @Override
     public List<MovieInfo> pagedMoviesSortedByRate(int pageNumber) {
         return pagedMoviesSortedBy(pageNumber,
