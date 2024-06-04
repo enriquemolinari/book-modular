@@ -9,6 +9,9 @@ import users.api.UsersSubSystem;
 
 import java.util.ServiceLoader;
 
+import static common.constants.Environment.ENVIRONMENT_PROPERTY_NAME;
+import static common.constants.Environment.ENVIRONMENT_TEST;
+
 @Configuration
 @Profile("test")
 public class AppTestConfiguration {
@@ -28,7 +31,8 @@ public class AppTestConfiguration {
     }
 
     private <T> T moduleFacadeLoader(Class<T> clazz) {
-        //TODO: set test environment for modules
+        //TODO: revisar esto...
+        System.setProperty(ENVIRONMENT_PROPERTY_NAME, ENVIRONMENT_TEST);
         return ServiceLoader.load(clazz)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Module facade class " + clazz.getName() + " could not be loaded"));

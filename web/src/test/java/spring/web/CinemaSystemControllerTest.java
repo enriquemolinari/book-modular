@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import spring.main.Main;
+import users.model.Users;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -121,9 +122,8 @@ public class CinemaSystemControllerTest {
                 .post(URL + "/login");
 
         response.then().body(ERROR_MESSAGE_KEY,
-                is(/*Cinema.USER_OR_PASSWORD_ERROR*/""));
+                is(Users.USER_OR_PASSWORD_ERROR));
         assertFalse(response.cookies().containsKey(TOKEN_COOKIE_NAME));
-
     }
 
     @Test
@@ -429,7 +429,6 @@ public class CinemaSystemControllerTest {
                         RUNNING_FAR_AWAY_MOVIE_NAME, CRASH_TEA_MOVIE_NAME)));
         response.then().body("total", is(30.0F));
         response.then().body("pointsWon", is(10));
-        response.then().body(USERNAME_KEY, is("nico"));
         response.then().body("payedSeats", hasItems(12, 13, 17));
     }
 

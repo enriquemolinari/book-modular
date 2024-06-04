@@ -43,10 +43,12 @@ public class SetUpDb {
                     "123456789012",
                     "123456789012");
 
+            //this order needs to be respected due to others modules users data
+            //this is a bit fragile, needs to be improved
+            em.persist(eu);
             em.persist(nu);
             em.persist(lu);
             em.persist(ju);
-            em.persist(eu);
 
             tx.commit();
         } catch (Exception e) {

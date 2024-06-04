@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 
-import static movies.main.PersistenceUnit.DERBY_EMBEDDED_SHOWS_MODULE;
+import static movies.main.PersistenceUnit.DERBY_EMBEDDED_MOVIES_MODULE;
 import static movies.model.ForTests.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,7 +34,7 @@ public class MoviesTest {
 
     @BeforeEach
     public void setUp() {
-        emf = Persistence.createEntityManagerFactory(DERBY_EMBEDDED_SHOWS_MODULE);
+        emf = Persistence.createEntityManagerFactory(DERBY_EMBEDDED_MOVIES_MODULE);
     }
 
     @Test

@@ -2,6 +2,8 @@ import users.api.UsersSubSystem;
 import users.main.UsersSubSystemStartUp;
 
 module users {
+    requires common;
+
     requires jakarta.persistence;
     requires lombok;
     requires org.hibernate.orm.core;

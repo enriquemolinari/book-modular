@@ -9,7 +9,7 @@ import users.api.AuthException;
 import users.api.UsersException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static users.main.PersistenceUnit.DERBY_EMBEDDED_SHOWS_MODULE;
+import static users.main.PersistenceUnit.DERBY_EMBEDDED_USERS_MODULE;
 
 public class UsersTest {
 
@@ -24,7 +24,7 @@ public class UsersTest {
 
     @BeforeEach
     public void setUp() {
-        emf = Persistence.createEntityManagerFactory(DERBY_EMBEDDED_SHOWS_MODULE);
+        emf = Persistence.createEntityManagerFactory(DERBY_EMBEDDED_USERS_MODULE);
     }
 
 

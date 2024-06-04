@@ -9,7 +9,6 @@ import org.springframework.core.env.AbstractEnvironment;
 import static common.constants.Environment.ENVIRONMENT_DEFAULT;
 import static common.constants.Environment.ENVIRONMENT_PROPERTY_NAME;
 
-
 @SpringBootApplication(exclude = HibernateJpaAutoConfiguration.class)
 @ComponentScan(basePackages = {"spring.*"})
 public class Main {

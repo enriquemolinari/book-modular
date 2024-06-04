@@ -21,10 +21,12 @@ public class ShowsSubSystemStartUp {
         }
         var emf = createEntityManagerFactory(DERBY_EMBEDDED_SHOWS_MODULE);
         setUpSampleDatabase(emf);
-        CreditCardPaymentProvider doNothingPaymentProvider =
-                (creditCardNumber, expire, securityCode, totalAmount) -> {
-                };
-        return showsSubsystem(emf, doNothingPaymentProvider);
+        return showsSubsystem(emf, doNothingPaymentProvider());
+    }
+
+    private static CreditCardPaymentProvider doNothingPaymentProvider() {
+        return (creditCardNumber, expire, securityCode, totalAmount) -> {
+        };
     }
 
     private static boolean isPROD(String environment) {
