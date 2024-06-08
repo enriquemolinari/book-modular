@@ -1,5 +1,6 @@
 package shows.model;
 
+import common.strings.NotBlankString;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -42,7 +43,7 @@ public class Movie {
         this.id = id;
         checkDurationGreaterThanZero(duration);
         checkGenresAtLeastHasOne(genres);
-        this.name = new NotBlankString(name, MOVIE_NAME_INVALID).value();
+        this.name = new NotBlankString(name, new ShowsException(MOVIE_NAME_INVALID)).value();
         this.duration = duration;
         this.releaseDate = releaseDate;
         this.genres = genres;

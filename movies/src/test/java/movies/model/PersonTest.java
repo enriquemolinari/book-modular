@@ -1,5 +1,6 @@
 package movies.model;
 
+import common.email.Email;
 import movies.api.MoviesException;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +29,7 @@ public class PersonTest {
 
     @Test
     public void emailMustBeValid() {
-        var e = assertThrows(MoviesException.class, () -> {
+        var e = assertThrows(RuntimeException.class, () -> {
             new Person("any valid name",
                     "any other valid surname", "bla.com");
             fail("a Person must not be instantiated with an invalid email");

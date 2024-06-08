@@ -9,7 +9,7 @@ import users.api.AuthException;
 import users.api.UsersException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static users.main.PersistenceUnit.DERBY_EMBEDDED_USERS_MODULE;
+import static users.builder.PersistenceUnit.DERBY_EMBEDDED_USERS_MODULE;
 
 public class UsersTest {
 
@@ -30,15 +30,19 @@ public class UsersTest {
 
     @Test
     public void loginOk() {
-        var users = new Users(emf, tests.doNothingToken());
+        var users = getUsers();
         registerUserJose(users);
         var token = users.login(JOSEUSER_USERNAME, JOSEUSER_PASS);
         assertEquals("aToken", token);
     }
 
+    private Users getUsers() {
+        return new Users(emf, tests.doNothingToken(), tests.doNothingEventPubliser());
+    }
+
     @Test
     public void loginFail() {
-        var users = new Users(emf, tests.doNothingToken());
+        var users = getUsers();
         registerUserJose(users);
         var e = assertThrows(AuthException.class, () -> {
             users.login(JOSEUSER_USERNAME, "wrongPassword");
@@ -50,7 +54,7 @@ public class UsersTest {
 
     @Test
     public void registerAUserNameTwice() {
-        var users = new Users(emf, tests.doNothingToken());
+        var users = getUsers();
         registerUserJose(users);
 
         var e = assertThrows(UsersException.class, () -> {
@@ -63,7 +67,7 @@ public class UsersTest {
 
     @Test
     public void userChangePassword() {
-        var users = new Users(emf, tests.doNothingToken());
+        var users = getUsers();
         var userId = registerUserJose(users);
         users.changePassword(userId, JOSEUSER_PASS, "123412341234",
                 "123412341234");
@@ -71,7 +75,7 @@ public class UsersTest {
 
     @Test
     public void userChangePasswordDoesNotMatch() {
-        var cinema = new Users(emf, tests.doNothingToken());
+        var cinema = getUsers();
         var userId = registerUserJose(cinema);
         var e = assertThrows(UsersException.class, () -> {
             cinema.changePassword(userId, JOSEUSER_PASS, "123412341234",
@@ -82,7 +86,7 @@ public class UsersTest {
 
     @Test
     public void userProfileFrom() {
-        var users = new Users(emf, tests.doNothingToken());
+        var users = getUsers();
         var userId = registerUserJose(users);
         var profile = users.profileFrom(userId);
         assertEquals(JOSEUSER_USERNAME, profile.username());
@@ -93,7 +97,7 @@ public class UsersTest {
 
     @Test
     public void userIdNotExists() {
-        var cinema = new Users(emf, tests.doNothingToken());
+        var cinema = getUsers();
         var e = assertThrows(UsersException.class, () -> {
             cinema.profileFrom(NON_EXISTENT_ID);
             fail("UserId should not exists in the database");

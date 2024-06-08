@@ -1,5 +1,7 @@
 package movies.model;
 
+import events.Publisher;
+import events.data.NewMovieEvent;
 import jakarta.persistence.*;
 import movies.api.*;
 
@@ -17,15 +19,17 @@ public class Movies implements MoviesSubSystem {
     private static final int DEFAULT_PAGE_SIZE = 20;
     private final EntityManagerFactory emf;
     private final int pageSize;
+    private final Publisher publisher;
     private EntityManager em;
 
-    public Movies(EntityManagerFactory emf, int pageSize) {
+    public Movies(EntityManagerFactory emf, int pageSize, Publisher publisher) {
         this.emf = emf;
         this.pageSize = pageSize;
+        this.publisher = publisher;
     }
 
-    public Movies(EntityManagerFactory emf) {
-        this(emf, DEFAULT_PAGE_SIZE);
+    public Movies(EntityManagerFactory emf, Publisher publisher) {
+        this(emf, DEFAULT_PAGE_SIZE, publisher);
     }
 
     @Override
@@ -55,6 +59,11 @@ public class Movies implements MoviesSubSystem {
         return inTx(em -> {
             var movie = new Movie(name, plot, duration, releaseDate, genres);
             em.persist(movie);
+            this.publisher.notify(em, new NewMovieEvent(movie.id(),
+                    movie.name(),
+                    movie.duration(),
+                    movie.releaseDate(),
+                    movie.genreAsListOfString()));
             return movie.toInfo();
         });
     }

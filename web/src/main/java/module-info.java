@@ -7,12 +7,12 @@ module web {
     requires shows;
     requires users;
     requires common;
+    requires notifications;
 
     uses UsersSubSystem;
     uses ShowsSubSystem;
     uses MoviesSubSystem;
 
-    //TODO: ser mas fino con el opens
     opens spring.main;
     opens spring.web;
 

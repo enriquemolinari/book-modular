@@ -1,5 +1,12 @@
 package users.model;
 
+import events.EventListener;
+import events.Publisher;
+import events.data.Event;
+import jakarta.persistence.EntityManager;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class ForTests {
@@ -37,5 +44,21 @@ public class ForTests {
         return new User(
                 "Nicolas", "Molinari", "nmolinari@yesmy.com",
                 "nmolinari", "oneplayminebrawl", "oneplayminebrawl");
+    }
+
+    Publisher doNothingEventPubliser() {
+        return new Publisher() {
+            private List<EventListener> subscribers = new ArrayList<>();
+
+            @Override
+            public <E extends Event> void subscribe(EventListener<E> listener) {
+                this.subscribers.add(listener);
+            }
+
+            @Override
+            public <E extends Event> void notify(EntityManager em, E event) {
+
+            }
+        };
     }
 }

@@ -1,5 +1,6 @@
 package users.model;
 
+import common.email.Email;
 import org.junit.jupiter.api.Test;
 import users.api.UserProfile;
 import users.api.UsersException;
@@ -47,7 +48,7 @@ public class UserTest {
 
     @Test
     public void userEmailIsInvalid() {
-        Exception e = assertThrows(UsersException.class, () -> {
+        Exception e = assertThrows(RuntimeException.class, () -> {
             new User(
                     "Enrique", "Molinari",
                     "enrique.molinarigmail.com",

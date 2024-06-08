@@ -1,8 +1,12 @@
 package movies.model;
 
-import jakarta.persistence.*;
+import common.strings.NotBlankString;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.*;
-import java.util.Map;
+import movies.api.MoviesException;
 
 import static movies.model.Schema.DATABASE_SCHEMA_NAME;
 
@@ -14,29 +18,29 @@ import static movies.model.Schema.DATABASE_SCHEMA_NAME;
 @EqualsAndHashCode(of = {"userName"})
 public class User {
 
-	static final String INVALID_USERNAME = "A valid username must be provided";
+    static final String INVALID_USERNAME = "A valid username must be provided";
 
-	@Id
-	private long id;
-	@Column(unique = true)
-	private String userName;
+    @Id
+    private long id;
+    @Column(unique = true)
+    private String userName;
 
-	public User(long id, String userName) {
-		this.id = id;
-		this.userName = new NotBlankString(userName,
-				INVALID_USERNAME).value();
-	}
+    public User(long id, String userName) {
+        this.id = id;
+        this.userName = new NotBlankString(userName,
+                new MoviesException(INVALID_USERNAME)).value();
+    }
 
 
-	public String userName() {
-		return userName;
-	}
+    public String userName() {
+        return userName;
+    }
 
-	public boolean hasUsername(String aUserName) {
-		return this.userName.equals(aUserName);
-	}
+    public boolean hasUsername(String aUserName) {
+        return this.userName.equals(aUserName);
+    }
 
-	Long id() {
-		return id;
-	}
+    Long id() {
+        return id;
+    }
 }

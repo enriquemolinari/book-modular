@@ -1,5 +1,7 @@
 package shows.model;
 
+import common.date.DateTimeProvider;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -61,8 +63,6 @@ public class ForTests {
                 LocalDateTime.now().plusDays(1), 10f,
                 new Theater("a Theater", Set.of(1, 2, 3, 4, 5, 6)));
     }
-
-
 }
 
 class PaymenentProviderFake implements CreditCardPaymentProvider {
@@ -87,6 +87,7 @@ class PaymenentProviderFake implements CreditCardPaymentProvider {
                 && this.securityCode.equals(securityCode)
                 && this.totalAmount == totalAmount;
     }
+
 }
 
 class PaymenentProviderThrowException implements CreditCardPaymentProvider {
@@ -96,3 +97,4 @@ class PaymenentProviderThrowException implements CreditCardPaymentProvider {
         throw new RuntimeException("very bad...");
     }
 }
+

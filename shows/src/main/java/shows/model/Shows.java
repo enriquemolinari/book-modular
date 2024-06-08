@@ -1,5 +1,8 @@
 package shows.model;
 
+import common.date.DateTimeProvider;
+import events.Publisher;
+import events.data.TicketsSoldEvent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import shows.api.*;
@@ -20,19 +23,21 @@ public class Shows implements ShowsSubSystem {
     private final EntityManagerFactory emf;
     private final CreditCardPaymentProvider paymentGateway;
     private final DateTimeProvider dateTimeProvider;
+    private final Publisher publisher;
     private EntityManager em;
 
     public Shows(EntityManagerFactory emf,
                  CreditCardPaymentProvider paymentGateway,
-                 DateTimeProvider provider) {
+                 DateTimeProvider provider, Publisher publisher) {
         this.emf = emf;
         this.paymentGateway = paymentGateway;
         this.dateTimeProvider = provider;
+        this.publisher = publisher;
     }
 
     public Shows(EntityManagerFactory emf,
-                 CreditCardPaymentProvider paymentGateway) {
-        this(emf, paymentGateway, DateTimeProvider.create());
+                 CreditCardPaymentProvider paymentGateway, Publisher publisher) {
+        this(emf, paymentGateway, DateTimeProvider.create(), publisher);
     }
 
     @Override
@@ -97,11 +102,17 @@ public class Shows implements ShowsSubSystem {
         return inTx(em -> {
             ShowTime showTime = showTimeBy(showTimeId);
             var user = buyerBy(userId);
-            return new Cashier(this.paymentGateway).paySeatsFor(selectedSeats,
+            var ticket = new Cashier(this.paymentGateway).paySeatsFor(selectedSeats,
                     showTime,
                     user,
                     Creditcard.of(creditCardNumber, expirationDate, secturityCode));
-            //TODO: implement observer to notify Notifications module and Users for points
+            this.publisher.notify(em, new TicketsSoldEvent(userId,
+                    ticket.getPointsWon(),
+                    ticket.total(),
+                    ticket.getPayedSeats(),
+                    ticket.getMovieName(),
+                    ticket.getShowStartTime()));
+            return ticket;
         });
     }
 

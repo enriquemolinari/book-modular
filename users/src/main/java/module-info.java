@@ -1,8 +1,6 @@
-import users.api.UsersSubSystem;
-import users.main.UsersSubSystemStartUp;
-
 module users {
     requires common;
+    requires events;
 
     requires jakarta.persistence;
     requires lombok;
@@ -10,6 +8,7 @@ module users {
     requires dev.paseto.jpaseto.api;
     opens users.model to org.hibernate.orm.core;
 
-    provides UsersSubSystem with UsersSubSystemStartUp;
     exports users.api;
+    exports users.builder to web;
+    exports users.listeners to web;
 }

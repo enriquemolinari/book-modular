@@ -1,5 +1,6 @@
 package shows.model;
 
+import common.date.DateTimeProvider;
 import org.junit.jupiter.api.Test;
 import shows.api.ShowsException;
 

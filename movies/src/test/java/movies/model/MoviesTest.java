@@ -1,5 +1,9 @@
 package movies.model;
 
+import events.EventListener;
+import events.Publisher;
+import events.data.Event;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import movies.api.MovieInfo;
@@ -10,8 +14,10 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.List;
 
-import static movies.main.PersistenceUnit.DERBY_EMBEDDED_MOVIES_MODULE;
+import static movies.builder.PersistenceUnit.DERBY_EMBEDDED_MOVIES_MODULE;
 import static movies.model.ForTests.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,6 +38,14 @@ public class MoviesTest {
     private static EntityManagerFactory emf;
     private final ForTests tests = new ForTests();
 
+    private Movies createMoviesSubsystemWithPaging(int pageSize) {
+        return new Movies(emf, pageSize, doNothingEventPubliser());
+    }
+
+    private Movies createMoviesSubsystem() {
+        return new Movies(emf, doNothingEventPubliser());
+    }
+
     @BeforeEach
     public void setUp() {
         emf = Persistence.createEntityManagerFactory(DERBY_EMBEDDED_MOVIES_MODULE);
@@ -39,7 +53,7 @@ public class MoviesTest {
 
     @Test
     public void rateMovie() {
-        var movies = new Movies(emf);
+        var movies = createMoviesSubsystem();
         var movieInfo = tests.createSuperMovie(movies);
         var joseId = registerUserJose(movies);
         var userRate = movies.rateMovieBy(joseId, movieInfo.id(), 4,
@@ -50,7 +64,7 @@ public class MoviesTest {
 
     @Test
     public void retrieveRatesInvalidPageNumber() {
-        var movies = new Movies(emf, 10 /* page size */);
+        var movies = createMoviesSubsystemWithPaging(10);
         var e = assertThrows(MoviesException.class, () -> {
             movies.pagedRatesOfOrderedDate(1L, 0);
         });
@@ -60,7 +74,7 @@ public class MoviesTest {
 
     @Test
     public void retrievePagedRatesFromMovie() {
-        var movies = new Movies(emf, 2 /* page size */);
+        var movies = createMoviesSubsystemWithPaging(2);
         var movieInfo = tests.createSuperMovie(movies);
         var joseId = registerUserJose(movies);
         var userId = registerAUser(movies);
@@ -76,7 +90,7 @@ public class MoviesTest {
 
     @Test
     public void retrieveAllPagedRates() {
-        var movies = new Movies(emf, 2 /* page size */);
+        var movies = createMoviesSubsystemWithPaging(2);
         var superMovieInfo = tests.createSuperMovie(movies);
         var otherMovieInfo = tests.createOtherSuperMovie(movies);
         var joseId = registerUserJose(movies);
@@ -90,7 +104,7 @@ public class MoviesTest {
 
     @Test
     public void rateTheSameMovieTwice() {
-        var movies = new Movies(emf);
+        var movies = createMoviesSubsystem();
         var movieInfo = tests.createSuperMovie(movies);
         var joseId = registerUserJose(movies);
         movies.rateMovieBy(joseId, movieInfo.id(), 4, "great movie");
@@ -103,7 +117,7 @@ public class MoviesTest {
 
     @Test
     public void retrieveMovie() {
-        var movies = new Movies(emf);
+        var movies = createMoviesSubsystem();
         var superMovie = tests.createSuperMovie(movies);
         MovieInfo movie = movies.movie(superMovie.id());
         assertEquals(2, movie.actors().size());
@@ -117,7 +131,7 @@ public class MoviesTest {
 
     @Test
     public void moviesSortedByReleaseDate() {
-        var movies = new Movies(emf, 1 /* page size */);
+        var movies = createMoviesSubsystemWithPaging(1);
         tests.createSuperMovie(movies);
         tests.createOtherSuperMovie(movies);
         var moviesList = movies.pagedMoviesSortedByReleaseDate(1);
@@ -127,7 +141,7 @@ public class MoviesTest {
 
     @Test
     public void retrieveAllMovies() {
-        var movies = new Movies(emf, 1 /* page size */);
+        var movies = createMoviesSubsystemWithPaging(1);
         tests.createSuperMovie(movies);
         tests.createOtherSuperMovie(movies);
         var moviesList = movies.pagedMoviesSortedByName(1);
@@ -144,7 +158,7 @@ public class MoviesTest {
 
     @Test
     public void searchMovieByName() {
-        var movies = new Movies(emf, 10 /* page size */);
+        var movies = createMoviesSubsystemWithPaging(10);
         tests.createSuperMovie(movies);
         tests.createOtherSuperMovie(movies);
         var moviesList = movies.pagedSearchMovieByName("another", 1);
@@ -154,7 +168,7 @@ public class MoviesTest {
 
     @Test
     public void searchMovieByNameNotFound() {
-        var movies = new Movies(emf, 10 /* page size */);
+        var movies = createMoviesSubsystemWithPaging(10);
         tests.createSuperMovie(movies);
         tests.createOtherSuperMovie(movies);
         var moviesList = movies.pagedSearchMovieByName("not_found_movie", 1);
@@ -163,7 +177,7 @@ public class MoviesTest {
 
     @Test
     public void movieIdNotExists() {
-        var movies = new Movies(emf, 10 /* page size */);
+        var movies = createMoviesSubsystemWithPaging(10);
         var e = assertThrows(MoviesException.class, () -> {
             movies.movie(NON_EXISTENT_ID);
             fail("MovieId should not exists in the database");
@@ -188,4 +202,19 @@ public class MoviesTest {
         emf.close();
     }
 
+    public Publisher doNothingEventPubliser() {
+        return new Publisher() {
+            private List<EventListener> subscribers = new ArrayList<>();
+
+            @Override
+            public <E extends Event> void subscribe(EventListener<E> listener) {
+                this.subscribers.add(listener);
+            }
+
+            @Override
+            public <E extends Event> void notify(EntityManager em, E event) {
+
+            }
+        };
+    }
 }

@@ -1,7 +1,9 @@
 package shows.model;
 
+import common.strings.NotBlankString;
 import jakarta.persistence.*;
 import lombok.*;
+import shows.api.ShowsException;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,7 +30,7 @@ public class Theater {
     private Set<Integer> seatNumbers;
 
     public Theater(String name, Set<Integer> seats) {
-        this.name = new NotBlankString(name, NAME_INVALID).value();
+        this.name = new NotBlankString(name, new ShowsException(NAME_INVALID)).value();
         this.seatNumbers = seats;
     }
 

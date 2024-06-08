@@ -1,41 +1,34 @@
 package spring.web;
 
 import movies.api.MoviesSubSystem;
+import movies.builder.MoviesSubSystemBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import shows.api.ShowsSubSystem;
+import shows.builder.ShowsSubSystemBuilder;
 import users.api.UsersSubSystem;
-
-import java.util.ServiceLoader;
-
-import static common.constants.Environment.ENVIRONMENT_PROPERTY_NAME;
-import static common.constants.Environment.ENVIRONMENT_TEST;
+import users.builder.UsersSubSystemBuilder;
 
 @Configuration
 @Profile("test")
 public class AppTestConfiguration {
     @Bean
     public MoviesSubSystem createMovies() {
-        return moduleFacadeLoader(MoviesSubSystem.class);
+        return new MoviesSubSystemBuilder()
+                .testEnv()
+                .build();
     }
 
     @Bean
     public ShowsSubSystem createShows() {
-        return moduleFacadeLoader(ShowsSubSystem.class);
+        return new ShowsSubSystemBuilder()
+                .testEnv()
+                .build();
     }
 
     @Bean
     public UsersSubSystem createUsers() {
-        return moduleFacadeLoader(UsersSubSystem.class);
+        return new UsersSubSystemBuilder().testEnv().build();
     }
-
-    private <T> T moduleFacadeLoader(Class<T> clazz) {
-        //TODO: revisar esto...
-        System.setProperty(ENVIRONMENT_PROPERTY_NAME, ENVIRONMENT_TEST);
-        return ServiceLoader.load(clazz)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Module facade class " + clazz.getName() + " could not be loaded"));
-    }
-
 }

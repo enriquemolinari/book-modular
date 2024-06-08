@@ -1,5 +1,7 @@
 package users.model;
 
+import common.email.Email;
+import common.strings.NotBlankString;
 import jakarta.persistence.*;
 import lombok.*;
 import users.api.UserProfile;
@@ -29,8 +31,7 @@ public class User {
     private String userName;
     private String name;
     private String surname;
-    @Embedded
-    private Email email;
+    private String email;
     // password must not escape by any means out of this object
     @Embedded
     private Password password;
@@ -41,9 +42,9 @@ public class User {
         checkPasswordsMatch(password, repeatPassword);
         this.name = name;
         this.surname = surname;
-        this.email = new Email(email);
+        this.email = new Email(email).asString();
         this.userName = new NotBlankString(userName,
-                INVALID_USERNAME).value();
+                new UsersException(INVALID_USERNAME)).value();
         this.password = new Password(password);
         this.points = 0;
     }
@@ -96,7 +97,7 @@ public class User {
     }
 
     String email() {
-        return this.email.asString();
+        return this.email;
     }
 
     public Map<String, Object> toMap() {
@@ -109,7 +110,7 @@ public class User {
 
     public UserProfile toProfile() {
         return new UserProfile(this.fullName(), this.userName,
-                this.email.asString(), this.points);
+                this.email, this.points);
     }
 
     private String fullName() {

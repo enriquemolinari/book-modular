@@ -28,7 +28,7 @@ public class Ticket {
     public boolean hasSeats(Set<Integer> seats) {
         return this.payedSeats.containsAll(seats);
     }
-    
+
     public float total() {
         return this.total;
     }

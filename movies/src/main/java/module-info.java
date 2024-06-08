@@ -1,14 +1,14 @@
-import movies.api.MoviesSubSystem;
-import movies.main.MoviesSubSystemStartUp;
-
 module movies {
     requires common;
+    requires events;
 
     requires jakarta.persistence;
     requires lombok;
     requires org.hibernate.orm.core;
     opens movies.model to org.hibernate.orm.core;
 
-    provides MoviesSubSystem with MoviesSubSystemStartUp;
+//    exports movies.api to web;
     exports movies.api;
+    exports movies.builder to web;
+    exports movies.listeners to web;
 }

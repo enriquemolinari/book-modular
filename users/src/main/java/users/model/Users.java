@@ -1,5 +1,8 @@
 package users.model;
 
+import common.date.DateTimeProvider;
+import events.Publisher;
+import events.data.NewUserEvent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.RollbackException;
@@ -19,17 +22,19 @@ public class Users implements UsersSubSystem {
     private final Token token;
     private final DateTimeProvider dateTimeProvider;
     private EntityManager em;
+    private Publisher publisher;
 
     public Users(EntityManagerFactory emf,
-                 Token token, DateTimeProvider provider) {
+                 Token token, DateTimeProvider provider, Publisher publisher) {
         this.emf = emf;
         this.token = token;
         this.dateTimeProvider = provider;
+        this.publisher = publisher;
     }
 
     public Users(EntityManagerFactory emf,
-                 Token token) {
-        this(emf, token, DateTimeProvider.create());
+                 Token token, Publisher publisher) {
+        this(emf, token, DateTimeProvider.create(), publisher);
     }
 
     @Override
@@ -60,6 +65,8 @@ public class Users implements UsersSubSystem {
                     password,
                     repeatPassword);
             em.persist(user);
+            //withing the Tx
+            this.publisher.notify(em, new NewUserEvent(user.id(), user.userName()));
             return user.id();
         });
     }

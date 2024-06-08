@@ -1,5 +1,6 @@
 package shows.model;
 
+import common.date.FormattedDateTime;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

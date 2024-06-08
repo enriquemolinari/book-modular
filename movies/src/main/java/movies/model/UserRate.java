@@ -1,5 +1,6 @@
 package movies.model;
 
+import common.date.FormattedDateTime;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -7,8 +8,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import movies.api.MoviesException;
 import movies.api.UserMovieRate;
-import static movies.model.Schema.DATABASE_SCHEMA_NAME;
+
 import java.time.LocalDateTime;
+
+import static movies.model.Schema.DATABASE_SCHEMA_NAME;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
