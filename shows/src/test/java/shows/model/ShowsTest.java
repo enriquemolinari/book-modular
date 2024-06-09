@@ -1,9 +1,7 @@
 package shows.model;
 
-import events.EventListener;
-import events.Publisher;
-import events.data.Event;
-import jakarta.persistence.EntityManager;
+import common.date.DateTimeProvider;
+import events.data.TicketsSoldEvent;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import org.junit.jupiter.api.AfterEach;
@@ -16,8 +14,6 @@ import shows.api.ShowsSubSystem;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,9 +37,7 @@ public class ShowsTest {
 
     @Test
     public void reservationHasExpired() {
-        var shows = new Shows(emf,
-                tests.doNothingPaymentProvider(),
-                () -> LocalDateTime.now().minusMinutes(50), doNothingEventPubliser());
+        var shows = createShowsSubSystem(() -> LocalDateTime.now().minusMinutes(50), new FakePublisher());
         var movieId = tests.createSuperMovie(shows);
         var theaterId = createATheater(shows);
         var showInfo = shows.addNewShowFor(movieId,
@@ -63,9 +57,7 @@ public class ShowsTest {
 
     @Test
     public void iCanReserveAnExpiredReservation() {
-        var shows = new Shows(emf,
-                tests.doNothingPaymentProvider(),
-                () -> LocalDateTime.now().minusMinutes(50), doNothingEventPubliser());
+        var shows = createShowsSubSystem(() -> LocalDateTime.now().minusMinutes(50), new FakePublisher());
         var movieId = tests.createSuperMovie(shows);
         var theaterId = createATheater(shows);
         var showInfo = shows.addNewShowFor(movieId,
@@ -87,7 +79,7 @@ public class ShowsTest {
 
     @Test
     public void aShowIsPlayingAt() {
-        var shows = new Shows(emf, tests.doNothingPaymentProvider(), doNothingEventPubliser());
+        var shows = createShowsSubSystem(DateTimeProvider.create(), new FakePublisher());
         var movieId = tests.createSuperMovie(shows);
         long theaterId = createATheater(shows);
         shows.addNewShowFor(movieId,
@@ -112,7 +104,7 @@ public class ShowsTest {
 
     @Test
     public void reserveSeats() {
-        var shows = new Shows(emf, tests.doNothingPaymentProvider(), doNothingEventPubliser());
+        var shows = createShowsSubSystem(DateTimeProvider.create(), new FakePublisher());
         var movieId = tests.createSuperMovie(shows);
         long theaterId = createATheater(shows);
         var showInfo = shows.addNewShowFor(movieId,
@@ -130,7 +122,7 @@ public class ShowsTest {
 
     @Test
     public void retrieveShow() {
-        var shows = new Shows(emf, tests.doNothingPaymentProvider(), doNothingEventPubliser());
+        var shows = createShowsSubSystem(DateTimeProvider.create(), new FakePublisher());
         var movieId = tests.createSuperMovie(shows);
         long theaterId = createATheater(shows);
         var showInfo = shows.addNewShowFor(movieId,
@@ -151,7 +143,7 @@ public class ShowsTest {
 
     @Test
     public void reserveAlreadReservedSeats() {
-        var shows = new Shows(emf, tests.doNothingPaymentProvider(), doNothingEventPubliser());
+        var shows = createShowsSubSystem(DateTimeProvider.create(), new FakePublisher());
         var movieId = tests.createSuperMovie(shows);
         long theaterId = createATheater(shows);
         var showInfo = shows.addNewShowFor(movieId,
@@ -171,8 +163,8 @@ public class ShowsTest {
     @Test
     public void confirmAndPaySeats() {
         var fakePaymenentProvider = tests.fakePaymenentProvider();
-        //TODO: test notify to observers gets executed
-        var shows = new Shows(emf, fakePaymenentProvider, doNothingEventPubliser());
+        var fakePublisher = new FakePublisher();
+        var shows = new Shows(emf, fakePaymenentProvider, fakePublisher);
         var movieId = tests.createSuperMovie(shows);
         long theaterId = createATheater(shows);
         var showInfo = shows.addNewShowFor(movieId,
@@ -185,6 +177,12 @@ public class ShowsTest {
                 JOSEUSER_CREDIT_CARD_NUMBER,
                 JOSEUSER_CREDIT_CARD_EXPIRITY,
                 JOSEUSER_CREDIT_CARD_SEC_CODE);
+        assertTrue(fakePublisher.invokedWithEvent(new TicketsSoldEvent(joseId,
+                ticket.getPointsWon(),
+                ticket.total(),
+                ticket.getPayedSeats(),
+                ticket.getMovieName(),
+                ticket.getShowStartTime())));
         assertTrue(ticket.hasSeats(Set.of(1, 5)));
         assertTrue(fakePaymenentProvider.hasBeanCalledWith(
                 JOSEUSER_CREDIT_CARD_NUMBER,
@@ -200,7 +198,7 @@ public class ShowsTest {
 
     @Test
     public void showTimeIdNotExists() {
-        var shows = new Shows(emf, tests.doNothingPaymentProvider(), doNothingEventPubliser());
+        var shows = createShowsSubSystem(DateTimeProvider.create(), new FakePublisher());
         var e = assertThrows(ShowsException.class, () -> {
             shows.show(NON_EXISTENT_ID);
             fail("ShowId should not exists in the database");
@@ -210,7 +208,7 @@ public class ShowsTest {
 
     @Test
     public void theaterIdNotExists() {
-        var shows = new Shows(emf, tests.doNothingPaymentProvider(), doNothingEventPubliser());
+        var shows = createShowsSubSystem(DateTimeProvider.create(), new FakePublisher());
         var movieId = tests.createSuperMovie(shows);
         var e = assertThrows(ShowsException.class, () -> {
             shows.addNewShowFor(movieId, LocalDateTime.now().plusDays(1), 10f, NON_EXISTENT_ID, 10);
@@ -219,6 +217,15 @@ public class ShowsTest {
         assertEquals(Shows.THEATER_ID_DOES_NOT_EXISTS, e.getMessage());
     }
 
+//    private Shows createShowsSubSystem2() {
+//        return new Shows(emf, tests.doNothingPaymentProvider(), new FakePublisher());
+//    }
+
+    private Shows createShowsSubSystem(DateTimeProvider dateTimeProvider, FakePublisher publisher) {
+        return new Shows(emf,
+                tests.doNothingPaymentProvider(),
+                dateTimeProvider, publisher);
+    }
 
     private Long registerUserJose(Shows shows) {
         return shows.addNewBuyer(1L);
@@ -238,19 +245,4 @@ public class ShowsTest {
         emf.close();
     }
 
-    public Publisher doNothingEventPubliser() {
-        return new Publisher() {
-            private List<EventListener> subscribers = new ArrayList<>();
-
-            @Override
-            public <E extends Event> void subscribe(EventListener<E> listener) {
-                this.subscribers.add(listener);
-            }
-
-            @Override
-            public <E extends Event> void notify(EntityManager em, E event) {
-
-            }
-        };
-    }
 }

@@ -1,6 +1,5 @@
 package spring.main;
 
-import common.constants.Environment;
 import movies.api.MoviesSubSystem;
 import movies.builder.MoviesSubSystemBuilder;
 import movies.listeners.NewUserListenerOnMovies;
@@ -17,7 +16,7 @@ import users.builder.UsersSubSystemBuilder;
 import users.listeners.NewTicketsListenerOnUsers;
 
 @Configuration
-@Profile(Environment.ENVIRONMENT_DEFAULT)
+@Profile(Main.ENVIRONMENT_DEFAULT)
 public class AppConfiguration {
 
     @Bean
