@@ -1,21 +1,25 @@
 package movies.model;
 
-import events.EventListener;
-import events.Publisher;
-import events.data.Event;
+import events.api.EventListener;
+import events.api.Publisher;
+import events.api.data.Event;
+import events.api.data.NewMovieEvent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import movies.api.Genre;
 import movies.api.MovieInfo;
 import movies.api.MoviesException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static movies.builder.PersistenceUnit.DERBY_EMBEDDED_MOVIES_MODULE;
 import static movies.model.ForTests.*;
@@ -42,8 +46,8 @@ public class MoviesTest {
         return new Movies(emf, pageSize, doNothingEventPubliser());
     }
 
-    private Movies createMoviesSubsystem() {
-        return new Movies(emf, doNothingEventPubliser());
+    private Movies createMoviesSubsystem(Publisher publisher) {
+        return new Movies(emf, publisher);
     }
 
     @BeforeEach
@@ -53,13 +57,25 @@ public class MoviesTest {
 
     @Test
     public void rateMovie() {
-        var movies = createMoviesSubsystem();
+        var movies = createMoviesSubsystem(doNothingEventPubliser());
         var movieInfo = tests.createSuperMovie(movies);
         var joseId = registerUserJose(movies);
         var userRate = movies.rateMovieBy(joseId, movieInfo.id(), 4,
                 "great movie");
         assertEquals(JOSEUSER_USERNAME, userRate.username());
         assertEquals(4, userRate.rateValue());
+    }
+
+    @Test
+    public void addNewMoviePublishEvent() {
+        var publisher = new FakePublisher();
+        var movies = createMoviesSubsystem(publisher);
+        String movieName = "a movie name";
+        int duration = 100;
+        LocalDate releaseDate = LocalDate.of(2024, 12, 12);
+        String aPlot = "a plot";
+        var movieInfo = movies.addNewMovie(movieName, duration, releaseDate, aPlot, Set.of(Genre.CRIME));
+        assertTrue(publisher.invokedWithEvent(new NewMovieEvent(movieInfo.id(), movieName, duration, releaseDate, movieInfo.genres())));
     }
 
     @Test
@@ -104,7 +120,7 @@ public class MoviesTest {
 
     @Test
     public void rateTheSameMovieTwice() {
-        var movies = createMoviesSubsystem();
+        var movies = createMoviesSubsystem(doNothingEventPubliser());
         var movieInfo = tests.createSuperMovie(movies);
         var joseId = registerUserJose(movies);
         movies.rateMovieBy(joseId, movieInfo.id(), 4, "great movie");
@@ -117,7 +133,7 @@ public class MoviesTest {
 
     @Test
     public void retrieveMovie() {
-        var movies = createMoviesSubsystem();
+        var movies = createMoviesSubsystem(doNothingEventPubliser());
         var superMovie = tests.createSuperMovie(movies);
         MovieInfo movie = movies.movie(superMovie.id());
         assertEquals(2, movie.actors().size());

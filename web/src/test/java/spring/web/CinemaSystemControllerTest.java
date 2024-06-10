@@ -1,19 +1,26 @@
 package spring.web;
 
 import io.restassured.response.Response;
+import movies.api.Genre;
+import movies.api.MoviesSubSystem;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
+import shows.api.ShowsSubSystem;
 import spring.main.Main;
+import users.api.UsersSubSystem;
 import users.model.Users;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;
@@ -22,6 +29,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest(classes = Main.class, webEnvironment = WebEnvironment.DEFINED_PORT)
+// Note: This test starts with a sample database and retains it until all tests are completed.
+// This approach may introduce issues since the database is shared across all tests.
+// see AppTestConfiguration
 @ActiveProfiles(value = "test")
 public class CinemaSystemControllerTest {
 
@@ -61,6 +71,12 @@ public class CinemaSystemControllerTest {
     private static final String TOKEN_COOKIE_NAME = "token";
     private static final String JSON_CONTENT_TYPE = "application/json";
     private static final String URL = "http://localhost:8080";
+    @Autowired
+    private MoviesSubSystem moviesSubSystem;
+    @Autowired
+    private ShowsSubSystem showsSubSystem;
+    @Autowired
+    private UsersSubSystem usersSubSystem;
 
     @Test
     public void loginOk() {
@@ -144,6 +160,56 @@ public class CinemaSystemControllerTest {
 
         loginAsPost("auniqueusername", "444467890124").then()
                 .cookie(TOKEN_COOKIE_NAME, containsString("v2.local"));
+    }
+
+    @Test
+    public void aPublishedRegisteredUserItIsAllowedToReserve() throws JSONException {
+        JSONObject registerRequestBody = new JSONObject();
+        registerRequestBody.put("name", "apublisheduser");
+        registerRequestBody.put("surname", "ausersurname");
+        registerRequestBody.put("email", "auser@ma.com");
+        registerRequestBody.put(USERNAME_KEY, "apublishedusername");
+        registerRequestBody.put(PASSWORD_KEY, "444467890124");
+        registerRequestBody.put("repeatPassword", "444467890124");
+
+        given().contentType(JSON_CONTENT_TYPE)
+                .body(registerRequestBody.toString())
+                .post(URL + "/users/register");
+
+        var loginResponse = loginAsPost("apublishedusername", "444467890124");
+        var token = getCookie(loginResponse);
+        JSONArray seatsRequest = jsonBodyForReserveSeats(29);
+        var response = reservePost(token, seatsRequest, 1);
+        response.then().statusCode(200);
+    }
+
+    @Test
+    public void aPublishedRegisteredUserItIsAllowedToRankAMovie() {
+        var userId = this.usersSubSystem.registerUser("ausertopublish2",
+                "surname",
+                "auser@unmail.com",
+                "ausertopublish2",
+                "444467890124",
+                "444467890124");
+        var userRateMovie = this.moviesSubSystem.rateMovieBy(userId,
+                4L,
+                4,
+                "fantastic");
+        assertEquals("ausertopublish2", userRateMovie.username());
+    }
+
+    @Test
+    public void aPublishedNewMovieAllowToCreateAShow() {
+        String movieName = "a new movie for test the publish/subscribe";
+        int movieDuration = 20;
+        var movieInfo = this.moviesSubSystem.addNewMovie(movieName,
+                movieDuration,
+                LocalDate.now().minusMonths(3),
+                "a plot",
+                Set.of(Genre.COMEDY));
+        var showInfo = this.showsSubSystem.addNewShowFor(movieInfo.id(), LocalDateTime.now().plusMonths(2), 10f, 1l, 10);
+        assertEquals(movieName, showInfo.movieName());
+        assertEquals("0hr 20mins", showInfo.movieDuration());
     }
 
     @Test
@@ -377,11 +443,11 @@ public class CinemaSystemControllerTest {
     public void reserveAlreadyReservedShowFail() {
         var token = loginAsNicoAndGetCookie();
         JSONArray seatsRequest = jsonBodyForReserveSeats(7);
-        reservePost(token, seatsRequest);
+        reservePost(token, seatsRequest, 1);
 
         var tokenJose = loginAsJoseAndGetCookie();
         JSONArray seatsRequest2 = jsonBodyForReserveSeats(5, 7, 9);
-        var failedResponse = reservePost(tokenJose, seatsRequest2);
+        var failedResponse = reservePost(tokenJose, seatsRequest2, 1);
 
         failedResponse.then().body(ERROR_MESSAGE_KEY,
                 is("All or some of the seats chosen are busy"));
@@ -408,7 +474,7 @@ public class CinemaSystemControllerTest {
 
         JSONObject paymentRequest = paymentRequestForSeats(seatsRequest);
 
-        var failedResponse = payPost(token, paymentRequest);
+        var failedResponse = payPost(token, paymentRequest, 1);
 
         failedResponse.then().body(ERROR_MESSAGE_KEY,
                 is("Reservation is required before confirm"));
@@ -418,11 +484,11 @@ public class CinemaSystemControllerTest {
     public void payReservedShowOk() throws JSONException {
         var token = loginAsNicoAndGetCookie();
         JSONArray seatsRequest = jsonBodyForReserveSeats(12, 13, 17);
-        reservePost(token, seatsRequest);
+        reservePost(token, seatsRequest, 1);
 
         JSONObject paymentRequest = paymentRequestForSeats(seatsRequest);
 
-        var response = payPost(token, paymentRequest);
+        var response = payPost(token, paymentRequest, 1);
 
         response.then().body(SHOW_MOVIE_NAME_KEY,
                 is(oneOf(SMALL_FISH_MOVIE_NAME, ROCK_IN_THE_SCHOOL_MOVIE_NAME,
@@ -446,7 +512,7 @@ public class CinemaSystemControllerTest {
 
     @Test
     public void reserveAShowOk() {
-        var response = reserveSeatsTwoFourFromShowOnePost();
+        var response = reserveSeatsTwoFourFromShowTwoPost();
 
         List<Map<String, Object>> list = response.then().extract().jsonPath()
                 .getList(CURRENT_SEATS_KEY);
@@ -458,37 +524,37 @@ public class CinemaSystemControllerTest {
                 .filter(l -> l.get(SEAT_AVAILABLE_KEY).equals(true))
                 .toList();
 
-        assertEquals(3, notAvailableSeats.size());
-        assertEquals(27, availableSeats.size());
+        assertEquals(2, notAvailableSeats.size());
+        assertEquals(28, availableSeats.size());
 
         response.then().body(INFO_KEY + "." + SHOW_MOVIE_NAME_KEY,
                 is(oneOf(SMALL_FISH_MOVIE_NAME, ROCK_IN_THE_SCHOOL_MOVIE_NAME,
                         RUNNING_FAR_AWAY_MOVIE_NAME, CRASH_TEA_MOVIE_NAME)));
-        response.then().body("info.showId", is(1));
+        response.then().body("info.showId", is(2));
         response.then().body(JSON_ROOT, hasKey(CURRENT_SEATS_KEY));
         response.then().body(INFO_KEY, hasKey("movieDuration"));
     }
 
-    private Response reserveSeatsTwoFourFromShowOnePost() {
+    private Response reserveSeatsTwoFourFromShowTwoPost() {
         var token = loginAsJoseAndGetCookie();
 
         JSONArray seatsRequest = jsonBodyForReserveSeats(2, 4);
 
-        return reservePost(token, seatsRequest);
+        return reservePost(token, seatsRequest, 2);
     }
 
-    private Response payPost(String token, JSONObject paymentRequest) {
+    private Response payPost(String token, JSONObject paymentRequest, int showId) {
         return given().contentType(JSON_CONTENT_TYPE)
                 .cookie(TOKEN_COOKIE_NAME, token)
                 .body(paymentRequest.toString())
-                .post(URL + "/shows/1/pay");
+                .post(URL + "/shows/" + showId + "/pay");
     }
 
-    private Response reservePost(String token, JSONArray seatsRequest) {
+    private Response reservePost(String token, JSONArray seatsRequest, int showId) {
         return given().contentType(JSON_CONTENT_TYPE)
                 .cookie(TOKEN_COOKIE_NAME, token)
                 .body(seatsRequest.toString())
-                .post(URL + "/shows/1/reserve");
+                .post(URL + "/shows/" + showId + "/reserve");
     }
 
     private JSONArray jsonBodyForReserveSeats(Integer... seats) {

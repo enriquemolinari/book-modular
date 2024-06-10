@@ -9,9 +9,10 @@ import lombok.*;
 import movies.api.MoviesException;
 
 import static movies.model.Schema.DATABASE_SCHEMA_NAME;
+import static movies.model.Schema.USER_ENTITY_TABLE_NAME;
 
 @Entity
-@Table(name = "ClientUser", schema = DATABASE_SCHEMA_NAME)
+@Table(name = USER_ENTITY_TABLE_NAME, schema = DATABASE_SCHEMA_NAME)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Setter(value = AccessLevel.PRIVATE)
 @Getter(value = AccessLevel.PRIVATE)

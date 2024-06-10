@@ -1,8 +1,8 @@
 package events.impl;
 
-import events.EventListener;
-import events.Publisher;
-import events.data.Event;
+import events.api.EventListener;
+import events.api.Publisher;
+import events.api.data.Event;
 import jakarta.persistence.EntityManager;
 
 import java.util.ArrayList;

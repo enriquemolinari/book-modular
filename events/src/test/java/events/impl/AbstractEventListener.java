@@ -1,6 +1,6 @@
 package events.impl;
 
-import events.data.Event;
+import events.api.data.Event;
 
 public class AbstractEventListener {
     protected Event event;

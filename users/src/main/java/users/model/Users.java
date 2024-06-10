@@ -1,8 +1,8 @@
 package users.model;
 
 import common.date.DateTimeProvider;
-import events.Publisher;
-import events.data.NewUserEvent;
+import events.api.Publisher;
+import events.api.data.NewUserEvent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.RollbackException;
@@ -65,7 +65,7 @@ public class Users implements UsersSubSystem {
                     password,
                     repeatPassword);
             em.persist(user);
-            //withing the Tx
+            //within the Tx
             this.publisher.notify(em, new NewUserEvent(user.id(), user.userName()));
             return user.id();
         });
@@ -80,19 +80,7 @@ public class Users implements UsersSubSystem {
             throw new UsersException(USER_NAME_ALREADY_EXISTS);
         }
     }
-
-    private User userBy(Long userId) {
-        return findByIdOrThrows(User.class, userId, USER_ID_NOT_EXISTS);
-    }
-
-    <T> T findByIdOrThrows(Class<T> entity, Long id, String msg) {
-        var e = em.find(entity, id);
-        if (e == null) {
-            throw new UsersException(msg);
-        }
-        return e;
-    }
-
+    
     private <T> T inTx(Function<EntityManager, T> toExecute) {
         em = emf.createEntityManager();
         var tx = em.getTransaction();
@@ -138,14 +126,14 @@ public class Users implements UsersSubSystem {
 
     @Override
     public UserProfile profileFrom(Long userId) {
-        return inTx(em -> userBy(userId).toProfile());
+        return inTx(em -> new FindUser().userBy(userId, em).toProfile());
     }
 
     @Override
     public void changePassword(Long userId, String currentPassword,
                                String newPassword1, String newPassword2) {
         inTx(em -> {
-            userBy(userId).changePassword(currentPassword, newPassword1,
+            new FindUser().userBy(userId, em).changePassword(currentPassword, newPassword1,
                     newPassword2);
             // just to conform the compiler
             return null;

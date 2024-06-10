@@ -69,7 +69,7 @@ public class User {
         this.password = new Password(newPassword1);
     }
 
-    void newEarnedPoints(int points) {
+    public void newEarnedPoints(int points) {
         if (points <= 0) {
             throw new UsersException(POINTS_MUST_BE_GREATER_THAN_ZERO);
         }

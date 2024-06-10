@@ -46,8 +46,8 @@ public class ForTests {
         return new PaymenentProviderThrowException();
     }
 
-    Long createSuperMovie(Shows cinema) {
-        return cinema.addNewMovie(1L, SUPER_MOVIE_NAME, 109,
+    Long createSuperMovie(Shows shows) {
+        return shows.addNewMovie(1L, SUPER_MOVIE_NAME, 109,
                 LocalDate.of(2023, 4, 5),
                 Set.of("ACTION", "ADVENTURE"));
     }

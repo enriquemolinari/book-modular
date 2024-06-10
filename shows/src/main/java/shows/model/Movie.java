@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static shows.model.Schema.DATABASE_SCHEMA_NAME;
+import static shows.model.Schema.*;
 
 @Entity
-@Table(schema = DATABASE_SCHEMA_NAME)
+@Table(name = MOVIE_ENTITY_TABLE_NAME, schema = DATABASE_SCHEMA_NAME)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Setter(value = AccessLevel.PRIVATE)
 @Getter(value = AccessLevel.PRIVATE)
@@ -28,12 +28,17 @@ public class Movie {
     static final String DURATION_INVALID = "Movie's duration must be greater than 0";
     static final String GENRES_INVALID = "You must add at least one genre to the movie";
     @Id
+    @Column(name = MOVIE_ID_COLUMN_NAME)
     private long id;
+    @Column(name = MOVIE_NAME_COLUMN_NAME)
     private String name;
+    @Column(name = MOVIE_DURATION_COLUMN_NAME)
     private int duration;
+    @Column(name = MOVIE_RELEASEDATE_COLUMN_NAME)
     private LocalDate releaseDate;
     @ElementCollection
-    @CollectionTable(schema = DATABASE_SCHEMA_NAME)
+    @CollectionTable(name = MOVIE_GENRES_TABLE_NAME, schema = DATABASE_SCHEMA_NAME, joinColumns = @JoinColumn(name = MOVIE_GENRE_ID_COLUMN_NAME))
+    @Column(name = MOVIE_GENRE_NAME_COLUMN_NAME)
     private Set<String> genres;
     @OneToMany(mappedBy = "movieToBeScreened")
     private List<ShowTime> showTimes;

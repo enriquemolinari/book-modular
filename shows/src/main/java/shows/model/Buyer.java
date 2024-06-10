@@ -10,9 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static shows.model.Schema.DATABASE_SCHEMA_NAME;
+import static shows.model.Schema.USER_ENTITY_TABLE_NAME;
 
 @Entity
-@Table(schema = DATABASE_SCHEMA_NAME)
+@Table(name = USER_ENTITY_TABLE_NAME, schema = DATABASE_SCHEMA_NAME)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Setter(value = AccessLevel.PRIVATE)
 @Getter(value = AccessLevel.PRIVATE)

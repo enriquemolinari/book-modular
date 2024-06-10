@@ -1,7 +1,7 @@
-package events;
+package events.api;
 
 
-import events.data.Event;
+import events.api.data.Event;
 import events.impl.EventPublisher;
 import jakarta.persistence.EntityManager;
 

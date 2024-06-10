@@ -1,6 +1,6 @@
-package events;
+package events.api;
 
-import events.data.Event;
+import events.api.data.Event;
 import jakarta.persistence.EntityManager;
 
 public interface EventListener<E extends Event> {

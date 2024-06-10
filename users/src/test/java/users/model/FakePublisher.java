@@ -1,4 +1,4 @@
-package shows.model;
+package users.model;
 
 import events.api.EventListener;
 import events.api.Publisher;

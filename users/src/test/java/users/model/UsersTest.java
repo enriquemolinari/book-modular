@@ -1,5 +1,7 @@
 package users.model;
 
+import events.api.Publisher;
+import events.api.data.NewUserEvent;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import org.junit.jupiter.api.AfterEach;
@@ -30,19 +32,19 @@ public class UsersTest {
 
     @Test
     public void loginOk() {
-        var users = getUsers();
+        var users = getUsers(tests.doNothingEventPubliser());
         registerUserJose(users);
         var token = users.login(JOSEUSER_USERNAME, JOSEUSER_PASS);
         assertEquals("aToken", token);
     }
 
-    private Users getUsers() {
-        return new Users(emf, tests.doNothingToken(), tests.doNothingEventPubliser());
+    private Users getUsers(Publisher publisher) {
+        return new Users(emf, tests.doNothingToken(), publisher);
     }
 
     @Test
     public void loginFail() {
-        var users = getUsers();
+        var users = getUsers(tests.doNothingEventPubliser());
         registerUserJose(users);
         var e = assertThrows(AuthException.class, () -> {
             users.login(JOSEUSER_USERNAME, "wrongPassword");
@@ -54,7 +56,7 @@ public class UsersTest {
 
     @Test
     public void registerAUserNameTwice() {
-        var users = getUsers();
+        var users = getUsers(tests.doNothingEventPubliser());
         registerUserJose(users);
 
         var e = assertThrows(UsersException.class, () -> {
@@ -67,7 +69,7 @@ public class UsersTest {
 
     @Test
     public void userChangePassword() {
-        var users = getUsers();
+        var users = getUsers(tests.doNothingEventPubliser());
         var userId = registerUserJose(users);
         users.changePassword(userId, JOSEUSER_PASS, "123412341234",
                 "123412341234");
@@ -75,7 +77,7 @@ public class UsersTest {
 
     @Test
     public void userChangePasswordDoesNotMatch() {
-        var cinema = getUsers();
+        var cinema = getUsers(tests.doNothingEventPubliser());
         var userId = registerUserJose(cinema);
         var e = assertThrows(UsersException.class, () -> {
             cinema.changePassword(userId, JOSEUSER_PASS, "123412341234",
@@ -86,7 +88,7 @@ public class UsersTest {
 
     @Test
     public void userProfileFrom() {
-        var users = getUsers();
+        var users = getUsers(tests.doNothingEventPubliser());
         var userId = registerUserJose(users);
         var profile = users.profileFrom(userId);
         assertEquals(JOSEUSER_USERNAME, profile.username());
@@ -97,12 +99,23 @@ public class UsersTest {
 
     @Test
     public void userIdNotExists() {
-        var cinema = getUsers();
+        var cinema = getUsers(tests.doNothingEventPubliser());
         var e = assertThrows(UsersException.class, () -> {
             cinema.profileFrom(NON_EXISTENT_ID);
             fail("UserId should not exists in the database");
         });
         assertEquals(Users.USER_ID_NOT_EXISTS, e.getMessage());
+    }
+
+    @Test
+    public void addRegisterNewUserPublishEvent() {
+        var publisher = new FakePublisher();
+        var users = getUsers(publisher);
+        var userId = users.registerUser(JOSEUSER_NAME, JOSEUSER_SURNAME,
+                JOSEUSER_EMAIL,
+                JOSEUSER_USERNAME,
+                JOSEUSER_PASS, JOSEUSER_PASS);
+        assertTrue(publisher.invokedWithEvent(new NewUserEvent(userId, JOSEUSER_USERNAME)));
     }
 
     private Long registerUserJose(Users users) {

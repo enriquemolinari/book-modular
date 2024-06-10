@@ -1,8 +1,8 @@
 package shows.model;
 
 import common.date.DateTimeProvider;
-import events.Publisher;
-import events.data.TicketsSoldEvent;
+import events.api.Publisher;
+import events.api.data.TicketsSoldEvent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import shows.api.*;

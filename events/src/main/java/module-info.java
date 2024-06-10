@@ -1,6 +1,6 @@
 module events {
-    exports events.data;
-    exports events;
+    exports events.api.data;
+    exports events.api;
 
     requires jakarta.persistence;
 }

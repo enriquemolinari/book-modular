@@ -1,4 +1,4 @@
-package events.data;
+package events.api.data;
 
 import java.time.LocalDate;
 import java.util.Set;
