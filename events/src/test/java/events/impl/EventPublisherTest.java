@@ -1,8 +1,8 @@
 package events.impl;
 
 import events.api.EventListener;
-import events.api.data.NewMovieEvent;
-import events.api.data.NewUserEvent;
+import events.api.data.movies.NewMovieEvent;
+import events.api.data.users.NewUserEvent;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 

@@ -1,7 +1,7 @@
 package shows.listeners;
 
 import events.api.EventListener;
-import events.api.data.NewMovieEvent;
+import events.api.data.movies.NewMovieEvent;
 import jakarta.persistence.EntityManager;
 import org.hibernate.Session;
 import org.hibernate.jdbc.Work;

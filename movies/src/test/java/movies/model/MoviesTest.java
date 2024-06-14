@@ -3,7 +3,7 @@ package movies.model;
 import events.api.EventListener;
 import events.api.Publisher;
 import events.api.data.Event;
-import events.api.data.NewMovieEvent;
+import events.api.data.movies.NewMovieEvent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;

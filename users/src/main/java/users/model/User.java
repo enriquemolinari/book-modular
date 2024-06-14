@@ -9,10 +9,10 @@ import users.api.UsersException;
 
 import java.util.Map;
 
-import static users.model.Schema.DATABASE_SCHEMA_NAME;
+import static users.model.Schema.*;
 
 @Entity
-@Table(name = "ClientUser", schema = DATABASE_SCHEMA_NAME)
+@Table(name = USER_ENTITY_TABLE_NAME, schema = DATABASE_SCHEMA_NAME)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Setter(value = AccessLevel.PRIVATE)
 @Getter(value = AccessLevel.PRIVATE)
@@ -26,6 +26,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = USER_ID_COLUMN_NAME)
     private long id;
     @Column(unique = true)
     private String userName;
@@ -35,6 +36,7 @@ public class User {
     // password must not escape by any means out of this object
     @Embedded
     private Password password;
+    @Column(name = USER_POINTS_COLUMN_NAME)
     private int points;
 
     public User(String name, String surname, String email, String userName, String password,
@@ -69,7 +71,7 @@ public class User {
         this.password = new Password(newPassword1);
     }
 
-    public void newEarnedPoints(int points) {
+    void newEarnedPoints(int points) {
         if (points <= 0) {
             throw new UsersException(POINTS_MUST_BE_GREATER_THAN_ZERO);
         }

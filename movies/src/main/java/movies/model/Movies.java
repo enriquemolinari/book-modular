@@ -1,7 +1,7 @@
 package movies.model;
 
 import events.api.Publisher;
-import events.api.data.NewMovieEvent;
+import events.api.data.movies.NewMovieEvent;
 import jakarta.persistence.*;
 import movies.api.*;
 

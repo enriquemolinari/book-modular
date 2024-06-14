@@ -1,7 +1,7 @@
 package notifications.listeners;
 
 import events.api.EventListener;
-import events.api.data.TicketsSoldEvent;
+import events.api.data.shows.TicketsSoldEvent;
 import jakarta.persistence.EntityManager;
 
 public class NewTicketsListenerOnNotifications implements EventListener<TicketsSoldEvent> {

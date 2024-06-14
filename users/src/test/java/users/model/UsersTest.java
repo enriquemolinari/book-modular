@@ -1,7 +1,7 @@
 package users.model;
 
 import events.api.Publisher;
-import events.api.data.NewUserEvent;
+import events.api.data.users.NewUserEvent;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import org.junit.jupiter.api.AfterEach;

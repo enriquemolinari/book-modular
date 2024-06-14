@@ -1,7 +1,7 @@
 package shows.model;
 
 import common.date.DateTimeProvider;
-import events.api.data.TicketsSoldEvent;
+import events.api.data.shows.TicketsSoldEvent;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import org.junit.jupiter.api.AfterEach;

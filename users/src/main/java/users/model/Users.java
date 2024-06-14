@@ -2,7 +2,7 @@ package users.model;
 
 import common.date.DateTimeProvider;
 import events.api.Publisher;
-import events.api.data.NewUserEvent;
+import events.api.data.users.NewUserEvent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.RollbackException;
@@ -80,7 +80,7 @@ public class Users implements UsersSubSystem {
             throw new UsersException(USER_NAME_ALREADY_EXISTS);
         }
     }
-    
+
     private <T> T inTx(Function<EntityManager, T> toExecute) {
         em = emf.createEntityManager();
         var tx = em.getTransaction();
@@ -126,17 +126,29 @@ public class Users implements UsersSubSystem {
 
     @Override
     public UserProfile profileFrom(Long userId) {
-        return inTx(em -> new FindUser().userBy(userId, em).toProfile());
+        return inTx(em -> userBy(userId).toProfile());
     }
 
     @Override
     public void changePassword(Long userId, String currentPassword,
                                String newPassword1, String newPassword2) {
         inTx(em -> {
-            new FindUser().userBy(userId, em).changePassword(currentPassword, newPassword1,
+            userBy(userId).changePassword(currentPassword, newPassword1,
                     newPassword2);
             // just to conform the compiler
             return null;
         });
+    }
+
+    User userBy(Long userId) {
+        return findByIdOrThrows(User.class, userId, Users.USER_ID_NOT_EXISTS);
+    }
+
+    <T> T findByIdOrThrows(Class<T> entity, Long id, String msg) {
+        var e = em.find(entity, id);
+        if (e == null) {
+            throw new UsersException(msg);
+        }
+        return e;
     }
 }

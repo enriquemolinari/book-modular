@@ -1,7 +1,7 @@
 package movies.listeners;
 
 import events.api.EventListener;
-import events.api.data.NewUserEvent;
+import events.api.data.users.NewUserEvent;
 import jakarta.persistence.EntityManager;
 import movies.model.Schema;
 import org.hibernate.Session;

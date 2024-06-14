@@ -6,7 +6,6 @@ module web {
     requires movies;
     requires shows;
     requires users;
-    requires common;
     requires notifications;
 
     uses UsersSubSystem;

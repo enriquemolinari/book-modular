@@ -18,6 +18,7 @@ import users.model.Users;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -160,6 +161,30 @@ public class CinemaSystemControllerTest {
 
         loginAsPost("auniqueusername", "444467890124").then()
                 .cookie(TOKEN_COOKIE_NAME, containsString("v2.local"));
+    }
+
+    @Test
+    public void aPublishedTicketSoldChangePointsWonInUserProfile() {
+        this.showsSubSystem.reserve(1L, 3L, Set.of(2, 3, 5, 6));
+        this.showsSubSystem.pay(1L,
+                3L,
+                Set.of(2, 3),
+                "numero",
+                YearMonth.of(YearMonth.now().getYear(), YearMonth.now().getMonth()),
+                "code1");
+        this.showsSubSystem.pay(1L,
+                3L,
+                Set.of(5, 6),
+                "numero",
+                YearMonth.of(YearMonth.now().getYear(), YearMonth.now().getMonth()),
+                "code1");
+        var profile = this.usersSubSystem.profileFrom(1l);
+        assertEquals(20, profile.points());
+    }
+
+    @Test
+    public void aPublishedTicketSoldPushANotificationJob() {
+
     }
 
     @Test
