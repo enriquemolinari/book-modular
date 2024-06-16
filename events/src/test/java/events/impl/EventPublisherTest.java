@@ -18,9 +18,9 @@ public class EventPublisherTest {
         var eventListener2 = new NewMovieEventListener();
         eventPublisher.subscribe(eventListener1);
         eventPublisher.subscribe(eventListener2);
-        eventPublisher.notify(null, new NewUserEvent(10L, "testuser"));
+        eventPublisher.notify(null, new NewUserEvent(10L, "testuser", "email@e.com"));
         assertFalse(eventListener2.updateInvoked());
-        assertTrue(eventListener1.updateInvokedWithEvent(new NewUserEvent(10L, "testuser")));
+        assertTrue(eventListener1.updateInvokedWithEvent(new NewUserEvent(10L, "testuser", "email@e.com")));
     }
 }
 

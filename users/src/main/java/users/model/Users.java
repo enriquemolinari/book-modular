@@ -66,7 +66,7 @@ public class Users implements UsersSubSystem {
                     repeatPassword);
             em.persist(user);
             //within the Tx
-            this.publisher.notify(em, new NewUserEvent(user.id(), user.userName()));
+            this.publisher.notify(em, new NewUserEvent(user.id(), user.userName(), user.email()));
             return user.id();
         });
     }

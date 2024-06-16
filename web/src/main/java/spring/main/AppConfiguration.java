@@ -3,7 +3,10 @@ package spring.main;
 import movies.api.MoviesSubSystem;
 import movies.builder.MoviesSubSystemBuilder;
 import movies.listeners.NewUserListenerOnMovies;
+import notifications.api.NotificationsSubSystem;
+import notifications.builder.NotificationsSubSystemBuilder;
 import notifications.listeners.NewTicketsListenerOnNotifications;
+import notifications.listeners.NewUserListenerOnNotifications;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -37,12 +40,21 @@ public class AppConfiguration {
     }
 
     @Bean
+    public NotificationsSubSystem createNotifications() {
+        return new NotificationsSubSystemBuilder()
+                .testEnv()
+                .startBackgroundJob()
+                .build();
+    }
+
+    @Bean
     public UsersSubSystem createUsers() {
         //testEnv because I want to use an embbededDb
         return new UsersSubSystemBuilder()
                 .testEnv()
                 .addListener(new NewUserListenerOnShows())
                 .addListener(new NewUserListenerOnMovies())
+                .addListener(new NewUserListenerOnNotifications())
                 .build();
     }
 }

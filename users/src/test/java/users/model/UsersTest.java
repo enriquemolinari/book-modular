@@ -115,7 +115,7 @@ public class UsersTest {
                 JOSEUSER_EMAIL,
                 JOSEUSER_USERNAME,
                 JOSEUSER_PASS, JOSEUSER_PASS);
-        assertTrue(publisher.invokedWithEvent(new NewUserEvent(userId, JOSEUSER_USERNAME)));
+        assertTrue(publisher.invokedWithEvent(new NewUserEvent(userId, JOSEUSER_USERNAME, JOSEUSER_EMAIL)));
     }
 
     private Long registerUserJose(Users users) {

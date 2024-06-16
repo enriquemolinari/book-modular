@@ -1,8 +1,10 @@
 package spring.web;
 
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import movies.api.Genre;
 import movies.api.MoviesSubSystem;
+import notifications.api.NotificationsSubSystem;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,8 +28,7 @@ import java.util.Set;
 import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = Main.class, webEnvironment = WebEnvironment.DEFINED_PORT)
 // Note: This test starts with a sample database and retains it until all tests are completed.
@@ -78,6 +79,8 @@ public class CinemaSystemControllerTest {
     private ShowsSubSystem showsSubSystem;
     @Autowired
     private UsersSubSystem usersSubSystem;
+    @Autowired
+    private NotificationsSubSystem notificationsSubSystem;
 
     @Test
     public void loginOk() {
@@ -184,7 +187,23 @@ public class CinemaSystemControllerTest {
 
     @Test
     public void aPublishedTicketSoldPushANotificationJob() {
-
+        Set<Integer> selectedSeats = Set.of(12, 13);
+        this.showsSubSystem.reserve(1L, 3L, selectedSeats);
+        this.showsSubSystem.pay(1L,
+                3L,
+                selectedSeats,
+                "numero",
+                YearMonth.of(YearMonth.now().getYear(), YearMonth.now().getMonth()),
+                "code1");
+        List<String[]> jobs = this.notificationsSubSystem.allJobs();
+        var showInfo = this.showsSubSystem.show(3L);
+        int lastJob = jobs.size() - 1;
+        JsonPath jsonPath = new JsonPath(jobs.get(lastJob)[1]);
+        assertEquals(1, jsonPath.getInt("idUser"));
+        assertTrue(selectedSeats.containsAll(jsonPath.getList("payedSeats")));
+        assertTrue(jsonPath.getList("payedSeats").containsAll(selectedSeats));
+        assertEquals(10, jsonPath.getInt("pointsWon"));
+        assertEquals(showInfo.info().playingTime(), jsonPath.getString("showStartTime"));
     }
 
     @Test
@@ -192,7 +211,7 @@ public class CinemaSystemControllerTest {
         JSONObject registerRequestBody = new JSONObject();
         registerRequestBody.put("name", "apublisheduser");
         registerRequestBody.put("surname", "ausersurname");
-        registerRequestBody.put("email", "auser@ma.com");
+        registerRequestBody.put("email", "auser2@ma.com");
         registerRequestBody.put(USERNAME_KEY, "apublishedusername");
         registerRequestBody.put(PASSWORD_KEY, "444467890124");
         registerRequestBody.put("repeatPassword", "444467890124");
@@ -221,6 +240,19 @@ public class CinemaSystemControllerTest {
                 4,
                 "fantastic");
         assertEquals("ausertopublish2", userRateMovie.username());
+    }
+
+    @Test
+    public void aPublishedRegisteredUserItIsAllowedToBeNotified() {
+        var userId = this.usersSubSystem.registerUser("ausertopublish3",
+                "surname",
+                "auser3@unmail.com",
+                "ausertopublish3",
+                "444467890124",
+                "444467890124");
+        var user = this.notificationsSubSystem.userBy(userId);
+        assertEquals("ausertopublish3", user[1]);
+        assertEquals("auser3@unmail.com", user[2]);
     }
 
     @Test

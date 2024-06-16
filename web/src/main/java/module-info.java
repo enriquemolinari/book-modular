@@ -1,16 +1,8 @@
-import movies.api.MoviesSubSystem;
-import shows.api.ShowsSubSystem;
-import users.api.UsersSubSystem;
-
 module web {
     requires movies;
     requires shows;
     requires users;
     requires notifications;
-
-    uses UsersSubSystem;
-    uses ShowsSubSystem;
-    uses MoviesSubSystem;
 
     opens spring.main;
     opens spring.web;
