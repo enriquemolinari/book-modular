@@ -1,9 +1,9 @@
 package shows.builder;
 
 import common.constants.Environment;
+import events.api.Event;
 import events.api.EventListener;
 import events.api.Publisher;
-import events.api.data.Event;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import shows.api.ShowsSubSystem;
@@ -14,7 +14,6 @@ import shows.model.Shows;
 import static shows.builder.PersistenceUnit.DERBY_CLIENT_SHOWS_MODULE;
 import static shows.builder.PersistenceUnit.DERBY_EMBEDDED_SHOWS_MODULE;
 
-//TODO: remove duplication code in builders
 public class ShowsSubSystemBuilder {
     private String environemnt;
     private Publisher publisher;

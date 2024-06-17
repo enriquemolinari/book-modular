@@ -1,8 +1,8 @@
 package movies.model;
 
+import events.api.Event;
 import events.api.EventListener;
 import events.api.Publisher;
-import events.api.data.Event;
 import jakarta.persistence.EntityManager;
 
 import java.util.ArrayList;

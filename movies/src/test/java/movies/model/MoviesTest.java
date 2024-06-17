@@ -1,8 +1,8 @@
 package movies.model;
 
+import events.api.Event;
 import events.api.EventListener;
 import events.api.Publisher;
-import events.api.data.Event;
 import events.api.data.movies.NewMovieEvent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;

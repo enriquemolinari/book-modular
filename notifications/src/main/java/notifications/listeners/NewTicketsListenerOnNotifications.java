@@ -4,17 +4,11 @@ import events.api.EventListener;
 import events.api.data.shows.TicketsSoldEvent;
 import jakarta.persistence.EntityManager;
 import notifications.model.EmailNotificationInfo;
-import notifications.model.Schema;
+import notifications.model.NotificationJobInsertStmt;
 import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-
-import static notifications.model.Schema.*;
 
 public class NewTicketsListenerOnNotifications implements EventListener<TicketsSoldEvent> {
     @Override
@@ -22,18 +16,10 @@ public class NewTicketsListenerOnNotifications implements EventListener<TicketsS
         Session session = em.unwrap(Session.class);
         session.doWork(new Work() {
             @Override
-            public void execute(Connection conn) throws SQLException {
+            public void execute(Connection conn) {
                 var emailJobInfo = EmailNotificationInfo.from(info).toJson();
-                final PreparedStatement st = conn.prepareStatement(
-                        "insert into " + DATABASE_SCHEMA_NAME + "."
-                                + JOBS_ENTITY_TABLE_NAME
-                                + "(" + JOBS_JSON_COLUMN_NAME + ","
-                                + Schema.JOBS_CREATEDAT_COLUMN_NAME + ") values(?, ?)");
-                st.setString(1, emailJobInfo);
-                st.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
-                st.executeUpdate();
+                new NotificationJobInsertStmt().insertJobStmt(conn, emailJobInfo);
             }
         });
-
     }
 }

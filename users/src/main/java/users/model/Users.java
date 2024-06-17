@@ -14,9 +14,9 @@ import users.api.UsersSubSystem;
 import java.util.function.Function;
 
 public class Users implements UsersSubSystem {
-    public static final String USER_OR_PASSWORD_ERROR = "Invalid username or password";
     static final String USER_NAME_ALREADY_EXISTS = "userName already exists";
     static final String USER_ID_NOT_EXISTS = "User not registered";
+    static final String USER_OR_PASSWORD_ERROR = "Invalid username or password";
     private static final int NUMBER_OF_RETRIES = 2;
     private final EntityManagerFactory emf;
     private final Token token;

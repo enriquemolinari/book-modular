@@ -16,7 +16,6 @@ import org.springframework.test.context.ActiveProfiles;
 import shows.api.ShowsSubSystem;
 import spring.main.Main;
 import users.api.UsersSubSystem;
-import users.model.Users;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -142,7 +141,7 @@ public class CinemaSystemControllerTest {
                 .post(URL + "/login");
 
         response.then().body(ERROR_MESSAGE_KEY,
-                is(Users.USER_OR_PASSWORD_ERROR));
+                is("Invalid username or password"));
         assertFalse(response.cookies().containsKey(TOKEN_COOKIE_NAME));
     }
 

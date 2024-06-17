@@ -1,9 +1,9 @@
 package users.builder;
 
 import common.constants.Environment;
+import events.api.Event;
 import events.api.EventListener;
 import events.api.Publisher;
-import events.api.data.Event;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import users.api.UsersSubSystem;

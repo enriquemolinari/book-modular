@@ -1,6 +1,6 @@
 package events.api.data.shows;
 
-import events.api.data.Event;
+import events.api.Event;
 
 import java.util.List;
 

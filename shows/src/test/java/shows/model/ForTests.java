@@ -17,17 +17,7 @@ public class ForTests {
     Movie createSmallFishMovie() {
         return createSmallFishMovie(LocalDate.of(2023, 10, 10));
     }
-
-//    User createUserCharly() {
-//        return new User(new Person("Carlos", "Edgun", "cedgun@mysite.com"),
-//                "cedgun", "afbcdefghigg", "afbcdefghigg");
-//    }
-//
-//    User createUserJoseph() {
-//        return new User(new Person("Joseph", "Valdun", "jvaldun@wabla.com"),
-//                "jvaldun", "tabcd1234igg", "tabcd1234igg");
-//    }
-
+    
     Buyer createUserNicolas() {
         return new Buyer(1L);
     }

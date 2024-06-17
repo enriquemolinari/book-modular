@@ -1,9 +1,9 @@
 package movies.builder;
 
 import common.constants.Environment;
+import events.api.Event;
 import events.api.EventListener;
 import events.api.Publisher;
-import events.api.data.Event;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import movies.api.MoviesSubSystem;
@@ -12,7 +12,6 @@ import movies.model.Movies;
 import static movies.builder.PersistenceUnit.DERBY_CLIENT_MOVIES_MODULE;
 import static movies.builder.PersistenceUnit.DERBY_EMBEDDED_MOVIES_MODULE;
 
-//TODO remover codigo dupicado en los builder
 public class MoviesSubSystemBuilder {
     private String environemnt;
     private Publisher publisher;
