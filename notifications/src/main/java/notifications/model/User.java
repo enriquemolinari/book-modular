@@ -31,6 +31,14 @@ public class User {
         this.email = email;
     }
 
+    String username() {
+        return this.userName;
+    }
+
+    String email() {
+        return this.email;
+    }
+
     public String[] toArray() {
         return new String[]{valueOf(this.id), this.userName, this.email};
     }

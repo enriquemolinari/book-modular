@@ -4,8 +4,7 @@ import common.constants.Environment;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import notifications.api.NotificationsSubSystem;
-import notifications.model.Notifications;
-import notifications.model.NotificationsBackgroundWorker;
+import notifications.model.*;
 
 import static notifications.builder.PersistenceUnit.DERBY_CLIENT_NOTIFICATIONS_MODULE;
 import static notifications.builder.PersistenceUnit.DERBY_EMBEDDED_NOTIFICATIONS_MODULE;
@@ -32,18 +31,24 @@ public class NotificationsSubSystemBuilder {
     public NotificationsSubSystem build() {
         if (isProd()) {
             var emf = createEntityManagerFactory(DERBY_CLIENT_NOTIFICATIONS_MODULE);
-            shouldStartBackgroundJob();
-            return new Notifications(emf);
+            return notifications(emf);
         }
         var emf = createEntityManagerFactory(DERBY_EMBEDDED_NOTIFICATIONS_MODULE);
         new SetUpDb(emf).createSchemaAndPopulateSampleData();
-        shouldStartBackgroundJob();
-        return new Notifications(emf);
+        return notifications(emf);
     }
 
-    private void shouldStartBackgroundJob() {
+    private Notifications notifications(EntityManagerFactory emf) {
+        var notifications = new Notifications(emf);
+        shouldStartBackgroundJob(emf);
+        return notifications;
+    }
+
+    private void shouldStartBackgroundJob(EntityManagerFactory emf) {
         if (startBackgroundJob) {
-            new NotificationsBackgroundWorker().startUp();
+            new NotificationsBackgroundWorker(
+                    new NotificationsJobProcessor(emf,
+                            new NotificationSender(new TheBestEmailProvider()))).startUp();
         }
     }
 

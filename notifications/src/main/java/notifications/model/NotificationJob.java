@@ -28,4 +28,12 @@ public class NotificationJob {
     public String[] toArray() {
         return new String[]{valueOf(this.id), this.jsonJob, this.createdAt.toString()};
     }
+
+    EmailNotificationInfo asInfo() {
+        return EmailNotificationInfo.from(this.jsonJob);
+    }
+
+    public Long id() {
+        return this.id;
+    }
 }
