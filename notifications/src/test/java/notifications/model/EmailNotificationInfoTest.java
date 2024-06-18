@@ -13,7 +13,7 @@ public class EmailNotificationInfoTest {
     public static final float TOTAL = 100f;
     public static final int POINTS_WON = 10;
     public static final List<Integer> PAYED_SEATS = List.of(1, 2);
-    private static String JSON = "{\"idUser\":1,\"pointsWon\":10,\"total\":100.0,\"payedSeats\":[1,2],\"movieName\":\"movie name\",\"showStartTime\":\"10:40\"}";
+    private static final String JSON = "{\"idUser\":1,\"pointsWon\":10,\"total\":100.0,\"payedSeats\":[1,2],\"movieName\":\"movie name\",\"showStartTime\":\"10:40\"}";
 
     @Test
     public void fromInfoToJson() {

@@ -5,7 +5,7 @@ import jakarta.persistence.EntityManager;
 import java.util.List;
 
 class AllJobsRetriever {
-    private EntityManager em;
+    private final EntityManager em;
 
     public AllJobsRetriever(EntityManager em) {
         this.em = em;

@@ -3,7 +3,7 @@ package notifications.model;
 import jakarta.persistence.EntityManager;
 
 class UserRetriever {
-    private EntityManager em;
+    private final EntityManager em;
 
     public UserRetriever(EntityManager em) {
         this.em = em;

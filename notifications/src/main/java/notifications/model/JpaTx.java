@@ -6,7 +6,7 @@ import jakarta.persistence.EntityManagerFactory;
 import java.util.function.Consumer;
 
 public class JpaTx {
-    private EntityManagerFactory emf;
+    private final EntityManagerFactory emf;
 
     public JpaTx(EntityManagerFactory emf) {
         this.emf = emf;

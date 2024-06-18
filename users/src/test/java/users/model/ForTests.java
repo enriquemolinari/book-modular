@@ -48,7 +48,7 @@ public class ForTests {
 
     Publisher doNothingEventPubliser() {
         return new Publisher() {
-            private List<EventListener> subscribers = new ArrayList<>();
+            private final List<EventListener> subscribers = new ArrayList<>();
 
             @Override
             public <E extends Event> void subscribe(EventListener<E> listener) {

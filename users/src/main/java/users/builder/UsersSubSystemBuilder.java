@@ -15,8 +15,8 @@ import static users.builder.PersistenceUnit.DERBY_EMBEDDED_USERS_MODULE;
 
 public class UsersSubSystemBuilder {
     private static final String SECRET = "nXXh3Xjr2T0ofFilg3kw8BwDEyHmS6OIe4cjWUm2Sm0=";
+    private final Publisher publisher;
     private String environemnt;
-    private Publisher publisher;
 
     public UsersSubSystemBuilder() {
         this.publisher = Publisher.creates();

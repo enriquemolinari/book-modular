@@ -216,11 +216,7 @@ public class ShowsTest {
         });
         assertEquals(Shows.THEATER_ID_DOES_NOT_EXISTS, e.getMessage());
     }
-
-//    private Shows createShowsSubSystem2() {
-//        return new Shows(emf, tests.doNothingPaymentProvider(), new FakePublisher());
-//    }
-
+    
     private Shows createShowsSubSystem(DateTimeProvider dateTimeProvider, FakePublisher publisher) {
         return new Shows(emf,
                 tests.doNothingPaymentProvider(),

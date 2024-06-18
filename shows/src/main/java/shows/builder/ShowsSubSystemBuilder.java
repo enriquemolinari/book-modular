@@ -15,8 +15,8 @@ import static shows.builder.PersistenceUnit.DERBY_CLIENT_SHOWS_MODULE;
 import static shows.builder.PersistenceUnit.DERBY_EMBEDDED_SHOWS_MODULE;
 
 public class ShowsSubSystemBuilder {
+    private final Publisher publisher;
     private String environemnt;
-    private Publisher publisher;
 
     public ShowsSubSystemBuilder() {
         this.publisher = Publisher.creates();

@@ -54,8 +54,6 @@ public class Movie {
     // this is pre-calculated rating for this movie
     @Embedded
     private Rating rating;
-//	@OneToMany(mappedBy = "movieToBeScreened")
-//	private List<ShowTime> showTimes;
 
     public Movie(String name, String plot, int duration, LocalDate releaseDate,
                  Set<Genre> genres, List<Actor> actors, List<Person> directors) {
@@ -142,14 +140,7 @@ public class Movie {
     String name() {
         return this.name;
     }
-
-//	public MovieShows toMovieShow() {
-//		return new MovieShows(this.id, this.name,
-//				new MovieDurationFormat(duration).toString(),
-//				genreAsListOfString(), this.showTimes.stream()
-//						.map(ShowTime::toShowInfo).toList());
-//	}
-
+    
     public void addAnActor(String name, String surname, String email,
                            String characterName) {
         this.actors.add(

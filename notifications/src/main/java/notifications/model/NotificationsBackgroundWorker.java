@@ -5,7 +5,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class NotificationsBackgroundWorker {
-    private NotificationsJobProcessor jobProcessor;
+    private final NotificationsJobProcessor jobProcessor;
 
     public NotificationsBackgroundWorker(NotificationsJobProcessor jobProcessor) {
         this.jobProcessor = jobProcessor;

@@ -21,8 +21,8 @@ public class Users implements UsersSubSystem {
     private final EntityManagerFactory emf;
     private final Token token;
     private final DateTimeProvider dateTimeProvider;
+    private final Publisher publisher;
     private EntityManager em;
-    private Publisher publisher;
 
     public Users(EntityManagerFactory emf,
                  Token token, DateTimeProvider provider, Publisher publisher) {

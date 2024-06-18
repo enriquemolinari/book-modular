@@ -13,8 +13,8 @@ import static movies.builder.PersistenceUnit.DERBY_CLIENT_MOVIES_MODULE;
 import static movies.builder.PersistenceUnit.DERBY_EMBEDDED_MOVIES_MODULE;
 
 public class MoviesSubSystemBuilder {
+    private final Publisher publisher;
     private String environemnt;
-    private Publisher publisher;
 
     public MoviesSubSystemBuilder() {
         this.publisher = Publisher.creates();

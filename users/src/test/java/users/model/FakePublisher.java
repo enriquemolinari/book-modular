@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FakePublisher implements Publisher {
-    private List<EventListener> listeners = new ArrayList<>();
+    private final List<EventListener> listeners = new ArrayList<>();
     private Event event;
 
     @Override

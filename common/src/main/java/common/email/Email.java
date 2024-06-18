@@ -4,7 +4,7 @@ public class Email {
 
     public static final String NOT_VALID_EMAIL = "Email address is not valid";
     private static final String REGEX = "^[\\w-_.+]*[\\w-_.]@(\\w+\\.)+\\w+\\w$";
-    private String email;
+    private final String email;
 
     public Email(String email) {
         if (!email.matches(REGEX)) {

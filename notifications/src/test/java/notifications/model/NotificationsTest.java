@@ -14,12 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static notifications.builder.PersistenceUnit.DERBY_EMBEDDED_NOTIFICATIONS_MODULE;
+import static notifications.model.NewSaleEmailTemplate.EMAIL_SUBJECT_SALE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class NotificationsTest {
     private static EntityManagerFactory emf;
-    private String json1 = "{\"idUser\":1,\"pointsWon\":10,\"total\":100.0,\"payedSeats\":[1,2,3],\"movieName\":\"movie name\",\"showStartTime\":\"28/09 10:40\"}";
+    private final String json1 = "{\"idUser\":1,\"pointsWon\":10,\"total\":100.0,\"payedSeats\":[1,2,3],\"movieName\":\"movie name\",\"showStartTime\":\"28/09 10:40\"}";
 
     @BeforeEach
     public void setUp() {
@@ -37,23 +38,29 @@ public class NotificationsTest {
         insertJob(json1);
         createUser(1L, "username1", "username1@mail.com");
         var fakeEmailProvider = processAllJobs();
-        String expectedBody = "Hello username1!\n" +
-                "You have new tickets!\n" +
-                "Here are the details of your booking: \n" +
-                "Movie: movie name\n" +
-                "Seats: 1,2,3\n" +
-                "Show time: 28/09 10:40\n" +
-                "Total paid: 100.0";
+        String expectedBody = """
+                Hello username1!
+                You have new tickets!
+                Here are the details of your booking:
+                Movie: movie name
+                Seats: 1,2,3
+                Show time: 28/09 10:40
+                Total paid: 100.0""";
         var jobs = new Notifications(emf).allJobs();
         assertTrue(jobs.isEmpty());
         var calls = new ArrayList<String[]>();
         calls.add(new String[]{"username1@mail.com",
-                NewSaleEmailTemplate.EMAIL_SUBJECT_SALE,
+                EMAIL_SUBJECT_SALE,
                 expectedBody});
         calls.add(new String[]{"username1@mail.com",
-                NewSaleEmailTemplate.EMAIL_SUBJECT_SALE,
+                EMAIL_SUBJECT_SALE,
                 expectedBody});
-        assertTrue(fakeEmailProvider.wasInvokedWith(calls));
+        assertEquals("username1@mail.com", fakeEmailProvider.invokedWith().get(0)[0]);
+        assertEquals(EMAIL_SUBJECT_SALE, fakeEmailProvider.invokedWith().get(0)[1]);
+        assertEquals(expectedBody, fakeEmailProvider.invokedWith().get(0)[2]);
+        assertEquals("username1@mail.com", fakeEmailProvider.invokedWith().get(1)[0]);
+        assertEquals(EMAIL_SUBJECT_SALE, fakeEmailProvider.invokedWith().get(1)[1]);
+        assertEquals(expectedBody, fakeEmailProvider.invokedWith().get(1)[2]);
     }
 
     private FakeEmailProvider processAllJobs() {
@@ -103,19 +110,14 @@ public class NotificationsTest {
 }
 
 class FakeEmailProvider implements EmailProvider {
-    private List<String[]> calls = new ArrayList<>();
+    private final List<String[]> calls = new ArrayList<>();
 
     @Override
     public void send(String to, String subject, String body) {
         this.calls.add(new String[]{to, subject, body});
     }
 
-    public boolean wasInvokedWith(List<String[]> calls) {
-        return this.calls.get(0)[0].equals(calls.get(0)[0])
-                && this.calls.get(0)[1].equals(calls.get(0)[1])
-                && this.calls.get(0)[2].equals(calls.get(0)[2])
-                && this.calls.get(1)[0].equals(calls.get(1)[0])
-                && this.calls.get(1)[1].equals(calls.get(1)[1])
-                && this.calls.get(1)[2].equals(calls.get(1)[2]);
+    public List<String[]> invokedWith() {
+        return this.calls;
     }
 }

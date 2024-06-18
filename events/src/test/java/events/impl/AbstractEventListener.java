@@ -1,7 +1,9 @@
 package events.impl;
 
+import events.api.Event;
+
 public class AbstractEventListener {
-  /*  protected Event event;
+    protected Event event;
 
     public boolean updateInvoked() {
         return this.event != null;
@@ -13,5 +15,4 @@ public class AbstractEventListener {
         }
         return event.equals(this.event);
     }
-*/
 }

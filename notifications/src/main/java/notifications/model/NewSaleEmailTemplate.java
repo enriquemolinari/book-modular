@@ -34,7 +34,7 @@ class NewSaleEmailTemplate {
                 System.lineSeparator() +
                 "You have new tickets!" +
                 System.lineSeparator() +
-                "Here are the details of your booking: " +
+                "Here are the details of your booking:" +
                 System.lineSeparator() +
                 "Movie: " + movieName +
                 System.lineSeparator() +
