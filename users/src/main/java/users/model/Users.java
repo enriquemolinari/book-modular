@@ -1,17 +1,15 @@
 package users.model;
 
 import common.date.DateTimeProvider;
+import common.db.Tx;
 import events.api.Publisher;
 import events.api.data.users.NewUserEvent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.RollbackException;
 import users.api.AuthException;
 import users.api.UserProfile;
 import users.api.UsersException;
 import users.api.UsersSubSystem;
-
-import java.util.function.Function;
 
 public class Users implements UsersSubSystem {
     static final String USER_NAME_ALREADY_EXISTS = "userName already exists";
@@ -22,7 +20,6 @@ public class Users implements UsersSubSystem {
     private final Token token;
     private final DateTimeProvider dateTimeProvider;
     private final Publisher publisher;
-    private EntityManager em;
 
     public Users(EntityManagerFactory emf,
                  Token token, DateTimeProvider provider, Publisher publisher) {
@@ -39,8 +36,8 @@ public class Users implements UsersSubSystem {
 
     @Override
     public String login(String username, String password) {
-        return inTx(em -> {
-            var q = this.em.createQuery(
+        return new Tx(emf).inTx(em -> {
+            var q = em.createQuery(
                     "select u from User u where u.userName = ?1 and u.password.password = ?2",
                     User.class);
             q.setParameter(1, username);
@@ -59,8 +56,8 @@ public class Users implements UsersSubSystem {
     public Long registerUser(String name, String surname, String email,
                              String userName,
                              String password, String repeatPassword) {
-        return inTxWithRetriesOnConflict((em) -> {
-            checkUserNameAlreadyExists(userName);
+        return new Tx(emf).inTxWithRetriesOnConflict((em) -> {
+            checkUserNameAlreadyExists(userName, em);
             var user = new User(name, surname, email, userName,
                     password,
                     repeatPassword);
@@ -68,55 +65,17 @@ public class Users implements UsersSubSystem {
             //within the Tx
             this.publisher.notify(em, new NewUserEvent(user.id(), user.userName(), user.email()));
             return user.id();
-        });
+        }, NUMBER_OF_RETRIES);
     }
 
-    private void checkUserNameAlreadyExists(String userName) {
-        var q = this.em.createQuery(
+    private void checkUserNameAlreadyExists(String userName, EntityManager em) {
+        var q = em.createQuery(
                 "select u from User u where u.userName = ?1 ", User.class);
         q.setParameter(1, userName);
         var mightBeAUser = q.getResultList();
         if (!mightBeAUser.isEmpty()) {
             throw new UsersException(USER_NAME_ALREADY_EXISTS);
         }
-    }
-
-    private <T> T inTx(Function<EntityManager, T> toExecute) {
-        em = emf.createEntityManager();
-        var tx = em.getTransaction();
-
-        try {
-            tx.begin();
-
-            T t = toExecute.apply(em);
-            tx.commit();
-
-            return t;
-        } catch (Exception e) {
-            tx.rollback();
-            throw e;
-        } finally {
-            em.close();
-        }
-    }
-
-    private <T> T inTxWithRetriesOnConflict(
-            Function<EntityManager, T> toExecute) {
-        int retries = 0;
-
-        while (retries < Users.NUMBER_OF_RETRIES) {
-            try {
-                return inTx(toExecute);
-                // There is no a great way in JPA to detect a constraint
-                // violation. I use RollbackException and retries one more
-                // time for specific use cases
-            } catch (RollbackException e) {
-                // jakarta.persistence.RollbackException
-                retries++;
-            }
-        }
-        throw new UsersException(
-                "Trasaction could not be completed due to concurrency conflic");
     }
 
     @Override
@@ -126,25 +85,25 @@ public class Users implements UsersSubSystem {
 
     @Override
     public UserProfile profileFrom(Long userId) {
-        return inTx(em -> userBy(userId).toProfile());
+        return new Tx(emf).inTx(em -> {
+            return userBy(userId, em).toProfile();
+        });
     }
 
     @Override
     public void changePassword(Long userId, String currentPassword,
                                String newPassword1, String newPassword2) {
-        inTx(em -> {
-            userBy(userId).changePassword(currentPassword, newPassword1,
+        new Tx(emf).inTx(em -> {
+            userBy(userId, em).changePassword(currentPassword, newPassword1,
                     newPassword2);
-            // just to conform the compiler
-            return null;
         });
     }
 
-    User userBy(Long userId) {
-        return findByIdOrThrows(User.class, userId, Users.USER_ID_NOT_EXISTS);
+    User userBy(Long userId, EntityManager em) {
+        return findByIdOrThrows(User.class, userId, Users.USER_ID_NOT_EXISTS, em);
     }
 
-    <T> T findByIdOrThrows(Class<T> entity, Long id, String msg) {
+    <T> T findByIdOrThrows(Class<T> entity, Long id, String msg, EntityManager em) {
         var e = em.find(entity, id);
         if (e == null) {
             throw new UsersException(msg);

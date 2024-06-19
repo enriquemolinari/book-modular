@@ -1,6 +1,7 @@
 package shows.model;
 
 import common.date.DateTimeProvider;
+import common.db.Tx;
 import events.api.Publisher;
 import events.api.data.shows.TicketsSoldEvent;
 import jakarta.persistence.EntityManager;
@@ -12,7 +13,6 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 
 public class Shows implements ShowsSubSystem {
     static final int MINUTES_TO_KEEP_RESERVATION = 5;
@@ -24,7 +24,6 @@ public class Shows implements ShowsSubSystem {
     private final CreditCardPaymentProvider paymentGateway;
     private final DateTimeProvider dateTimeProvider;
     private final Publisher publisher;
-    private EntityManager em;
 
     public Shows(EntityManagerFactory emf,
                  CreditCardPaymentProvider paymentGateway,
@@ -42,10 +41,12 @@ public class Shows implements ShowsSubSystem {
 
     @Override
     public List<MovieShows> showsUntil(LocalDateTime untilTo) {
-        return inTx(em -> movieShowsUntil(untilTo));
+        return new Tx(emf).inTx(em -> {
+            return movieShowsUntil(untilTo, em);
+        });
     }
 
-    private List<MovieShows> movieShowsUntil(LocalDateTime untilTo) {
+    private List<MovieShows> movieShowsUntil(LocalDateTime untilTo, EntityManager em) {
         var query = em.createQuery(
                         "from Movie m "
                                 + "join fetch m.showTimes s join fetch s.screenedIn "
@@ -61,7 +62,7 @@ public class Shows implements ShowsSubSystem {
 
     @Override
     public Long addNewTheater(String name, Set<Integer> seatsNumbers) {
-        return inTx(em -> {
+        return new Tx(emf).inTx(em -> {
             var theater = new Theater(name, seatsNumbers);
             em.persist(theater);
             return theater.id();
@@ -71,9 +72,9 @@ public class Shows implements ShowsSubSystem {
     @Override
     public ShowInfo addNewShowFor(Long movieId, LocalDateTime startTime,
                                   float price, Long theaterId, int pointsToWin) {
-        return inTx(em -> {
-            var movie = movieBy(movieId);
-            var theatre = theatreBy(theaterId);
+        return new Tx(emf).inTx(em -> {
+            var movie = movieBy(movieId, em);
+            var theatre = theatreBy(theaterId, em);
             var showTime = new ShowTime(movie, startTime, price, theatre,
                     pointsToWin);
             em.persist(showTime);
@@ -84,9 +85,9 @@ public class Shows implements ShowsSubSystem {
     @Override
     public DetailedShowInfo reserve(Long buyerId, Long showTimeId,
                                     Set<Integer> selectedSeats) {
-        return inTx(em -> {
-            ShowTime showTime = showTimeBy(showTimeId);
-            var user = buyerBy(buyerId);
+        return new Tx(emf).inTx(em -> {
+            ShowTime showTime = showTimeBy(showTimeId, em);
+            var user = buyerBy(buyerId, em);
             showTime.reserveSeatsFor(user, selectedSeats,
                     this.dateTimeProvider.now().plusMinutes(MINUTES_TO_KEEP_RESERVATION));
             return showTime.toDetailedInfo();
@@ -97,9 +98,9 @@ public class Shows implements ShowsSubSystem {
     public Ticket pay(Long userId, Long showTimeId, Set<Integer> selectedSeats,
                       String creditCardNumber, YearMonth expirationDate,
                       String secturityCode) {
-        return inTx(em -> {
-            ShowTime showTime = showTimeBy(showTimeId);
-            var user = buyerBy(userId);
+        return new Tx(emf).inTx(em -> {
+            ShowTime showTime = showTimeBy(showTimeId, em);
+            var user = buyerBy(userId, em);
             var ticket = new Cashier(this.paymentGateway).paySeatsFor(selectedSeats,
                     showTime,
                     user,
@@ -115,36 +116,37 @@ public class Shows implements ShowsSubSystem {
     }
 
     Long addNewMovie(Long id, String name, int duration, LocalDate releaseDate, Set<String> genres) {
-        return inTx(em -> {
+        return new Tx(emf).inTx(em -> {
             em.persist(new Movie(id, name, duration, releaseDate, genres));
             return id;
         });
     }
 
     Long addNewBuyer(Long id) {
-        return inTx(em -> {
+        return new Tx(emf).inTx(em -> {
             em.persist(new Buyer(id));
             return id;
         });
     }
 
-    private Theater theatreBy(Long theatreId) {
-        return findByIdOrThrows(Theater.class, theatreId, THEATER_ID_DOES_NOT_EXISTS);
+    private Theater theatreBy(Long theatreId, EntityManager em) {
+        return findByIdOrThrows(Theater.class, theatreId, THEATER_ID_DOES_NOT_EXISTS, em);
     }
 
-    private Movie movieBy(Long movieId) {
-        return findByIdOrThrows(Movie.class, movieId, MOVIE_ID_DOES_NOT_EXISTS);
+    private Movie movieBy(Long movieId, EntityManager em) {
+        return findByIdOrThrows(Movie.class, movieId, MOVIE_ID_DOES_NOT_EXISTS, em);
     }
 
-    private Buyer buyerBy(Long buyerId) {
-        return findByIdOrThrows(Buyer.class, buyerId, BUYER_ID_NOT_EXISTS);
+    private Buyer buyerBy(Long buyerId, EntityManager em) {
+        return findByIdOrThrows(Buyer.class, buyerId, BUYER_ID_NOT_EXISTS, em);
     }
 
-    private ShowTime showTimeBy(Long id) {
-        return findByIdOrThrows(ShowTime.class, id, SHOW_TIME_ID_NOT_EXISTS);
+    private ShowTime showTimeBy(Long id, EntityManager em) {
+        return findByIdOrThrows(ShowTime.class, id, SHOW_TIME_ID_NOT_EXISTS, em);
     }
 
-    <T> T findByIdOrThrows(Class<T> entity, Long id, String msg) {
+    //TODO remover ese find duplicado
+    <T> T findByIdOrThrows(Class<T> entity, Long id, String msg, EntityManager em) {
         var e = em.find(entity, id);
         if (e == null) {
             throw new ShowsException(msg);
@@ -154,28 +156,9 @@ public class Shows implements ShowsSubSystem {
 
     @Override
     public DetailedShowInfo show(Long id) {
-        return inTx(em -> {
-            var show = showTimeBy(id);
+        return new Tx(emf).inTx(em -> {
+            var show = showTimeBy(id, em);
             return show.toDetailedInfo();
         });
-    }
-
-    private <T> T inTx(Function<EntityManager, T> toExecute) {
-        em = emf.createEntityManager();
-        var tx = em.getTransaction();
-
-        try {
-            tx.begin();
-
-            T t = toExecute.apply(em);
-            tx.commit();
-
-            return t;
-        } catch (Exception e) {
-            tx.rollback();
-            throw e;
-        } finally {
-            em.close();
-        }
     }
 }

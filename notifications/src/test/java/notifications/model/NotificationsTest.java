@@ -1,5 +1,6 @@
 package notifications.model;
 
+import common.db.Tx;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import org.hibernate.Session;
@@ -93,7 +94,7 @@ public class NotificationsTest {
     }
 
     private void insertJob(String emailNotificationInfo) {
-        new JpaTx(emf).inTx((em) -> {
+        new Tx(emf).inTx((em) -> {
             Session session = em.unwrap(Session.class);
             session.doWork(new Work() {
                 @Override
@@ -105,7 +106,9 @@ public class NotificationsTest {
     }
 
     private void createUser(Long userId, String username, String email) {
-        new JpaTx(emf).inTx(em -> em.persist(new User(userId, username, email)));
+        new Tx(emf).inTx(em -> {
+            em.persist(new User(userId, username, email));
+        });
     }
 }
 

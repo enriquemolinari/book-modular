@@ -1,14 +1,17 @@
 package movies.model;
 
+import common.db.Tx;
 import events.api.Publisher;
 import events.api.data.movies.NewMovieEvent;
-import jakarta.persistence.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.NonUniqueResultException;
 import movies.api.*;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 
 public class Movies implements MoviesSubSystem {
     static final String MOVIE_ID_DOES_NOT_EXISTS = "Movie ID not found";
@@ -20,7 +23,6 @@ public class Movies implements MoviesSubSystem {
     private final EntityManagerFactory emf;
     private final int pageSize;
     private final Publisher publisher;
-    private EntityManager em;
 
     public Movies(EntityManagerFactory emf, int pageSize, Publisher publisher) {
         this.emf = emf;
@@ -34,16 +36,16 @@ public class Movies implements MoviesSubSystem {
 
     @Override
     public MovieInfo movie(Long id) {
-        return inTx(em -> {
+        return new Tx(this.emf).inTx(em -> {
             try {
-                return movieWithActorsById(id);
+                return movieWithActorsById(id, em);
             } catch (NonUniqueResultException | NoResultException e) {
                 throw new MoviesException(MOVIE_ID_DOES_NOT_EXISTS);
             }
         });
     }
 
-    private MovieInfo movieWithActorsById(Long id) {
+    private MovieInfo movieWithActorsById(Long id, EntityManager em) {
         return em
                 .createQuery("from Movie m "
                         + "join fetch m.actors a "
@@ -56,7 +58,7 @@ public class Movies implements MoviesSubSystem {
     @Override
     public MovieInfo addNewMovie(String name, int duration,
                                  LocalDate releaseDate, String plot, Set<Genre> genres) {
-        return inTx(em -> {
+        return new Tx(this.emf).inTx(em -> {
             var movie = new Movie(name, plot, duration, releaseDate, genres);
             em.persist(movie);
             this.publisher.notify(em, new NewMovieEvent(movie.id(),
@@ -71,7 +73,7 @@ public class Movies implements MoviesSubSystem {
     @Override
     public MovieInfo addActorTo(Long movieId, String name, String surname,
                                 String email, String characterName) {
-        return inTx(em -> {
+        return new Tx(this.emf).inTx(em -> {
             var movie = em.getReference(Movie.class, movieId);
             movie.addAnActor(name, surname, email, characterName);
             return movie.toInfo();
@@ -81,7 +83,7 @@ public class Movies implements MoviesSubSystem {
     @Override
     public MovieInfo addDirectorToMovie(Long movieId, String name,
                                         String surname, String email) {
-        return inTx(em -> {
+        return new Tx(this.emf).inTx(em -> {
             var movie = em.getReference(Movie.class, movieId);
             movie.addADirector(name, surname, email);
             return movie.toInfo();
@@ -91,18 +93,18 @@ public class Movies implements MoviesSubSystem {
     @Override
     public UserMovieRate rateMovieBy(Long userId, Long movieId, int rateValue,
                                      String comment) {
-        return inTxWithRetriesOnConflict(em -> {
-            checkUserIsRatingSameMovieTwice(userId, movieId);
-            var user = userBy(userId);
-            var movie = movieBy(movieId);
+        return new Tx(emf).inTxWithRetriesOnConflict(em -> {
+            checkUserIsRatingSameMovieTwice(userId, movieId, em);
+            var user = userBy(userId, em);
+            var movie = movieBy(movieId, em);
 
             var userRate = movie.rateBy(user, rateValue, comment);
             return userRate.toUserMovieRate();
-        });
+        }, NUMBER_OF_RETRIES);
     }
 
-    private void checkUserIsRatingSameMovieTwice(Long userId, Long movieId) {
-        var q = this.em.createQuery(
+    private void checkUserIsRatingSameMovieTwice(Long userId, Long movieId, EntityManager em) {
+        var q = em.createQuery(
                 "select ur from UserRate ur where ur.user.id = ?1 and movie.id = ?2",
                 UserRate.class);
         q.setParameter(1, userId);
@@ -113,15 +115,15 @@ public class Movies implements MoviesSubSystem {
         }
     }
 
-    private Movie movieBy(Long movieId) {
-        return findByIdOrThrows(Movie.class, movieId, MOVIE_ID_DOES_NOT_EXISTS);
+    private Movie movieBy(Long movieId, EntityManager em) {
+        return findByIdOrThrows(Movie.class, movieId, MOVIE_ID_DOES_NOT_EXISTS, em);
     }
 
-    private User userBy(Long userId) {
-        return findByIdOrThrows(User.class, userId, USER_ID_NOT_EXISTS);
+    private User userBy(Long userId, EntityManager em) {
+        return findByIdOrThrows(User.class, userId, USER_ID_NOT_EXISTS, em);
     }
 
-    <T> T findByIdOrThrows(Class<T> entity, Long id, String msg) {
+    <T> T findByIdOrThrows(Class<T> entity, Long id, String msg, EntityManager em) {
         var e = em.find(entity, id);
         if (e == null) {
             throw new MoviesException(msg);
@@ -133,7 +135,7 @@ public class Movies implements MoviesSubSystem {
     public List<UserMovieRate> pagedRatesOfOrderedDate(Long movieId,
                                                        int pageNumber) {
         checkPageNumberIsGreaterThanZero(pageNumber);
-        return inTx(em -> {
+        return new Tx(emf).inTx(em -> {
             var q = em.createQuery(
                     "select ur from UserRate ur "
                             + "where ur.movie.id = ?1 "
@@ -151,7 +153,7 @@ public class Movies implements MoviesSubSystem {
     public List<MovieInfo> pagedSearchMovieByName(String fullOrPartmovieName,
                                                   int pageNumber) {
         checkPageNumberIsGreaterThanZero(pageNumber);
-        return inTx(em -> {
+        return new Tx(emf).inTx(em -> {
             var q = em.createQuery(
                     "select m from Movie m "
                             // a trigram index is required
@@ -186,7 +188,7 @@ public class Movies implements MoviesSubSystem {
     private List<MovieInfo> pagedMoviesSortedBy(int pageNumber,
                                                 String orderByClause) {
         checkPageNumberIsGreaterThanZero(pageNumber);
-        return inTx(em -> {
+        return new Tx(this.emf).inTx(em -> {
             var q = em.createQuery(
                     "select m from Movie m "
                             + orderByClause,
@@ -198,7 +200,7 @@ public class Movies implements MoviesSubSystem {
     }
 
     Long addNewUser(Long id, String username) {
-        return inTx(em -> {
+        return new Tx(this.emf).inTx(em -> {
             em.persist(new User(id, username));
             return id;
         });
@@ -208,43 +210,5 @@ public class Movies implements MoviesSubSystem {
     public List<MovieInfo> pagedMoviesSortedByRate(int pageNumber) {
         return pagedMoviesSortedBy(pageNumber,
                 "order by m.rating.totalUserVotes desc, m.rating.rateValue desc");
-    }
-
-    private <T> T inTx(Function<EntityManager, T> toExecute) {
-        em = emf.createEntityManager();
-        var tx = em.getTransaction();
-
-        try {
-            tx.begin();
-
-            T t = toExecute.apply(em);
-            tx.commit();
-
-            return t;
-        } catch (Exception e) {
-            tx.rollback();
-            throw e;
-        } finally {
-            em.close();
-        }
-    }
-
-    private <T> T inTxWithRetriesOnConflict(
-            Function<EntityManager, T> toExecute) {
-        int retries = 0;
-
-        while (retries < Movies.NUMBER_OF_RETRIES) {
-            try {
-                return inTx(toExecute);
-                // There is no a great way in JPA to detect a constraint
-                // violation. I use RollbackException and retries one more
-                // time for specific use cases
-            } catch (RollbackException e) {
-                // jakarta.persistence.RollbackException
-                retries++;
-            }
-        }
-        throw new MoviesException(
-                "Trasaction could not be completed due to concurrency conflic");
     }
 }
