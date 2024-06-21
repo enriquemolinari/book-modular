@@ -1,4 +1,4 @@
-package shows.builder;
+package shows.model;
 
 public interface PersistenceUnit {
     String DERBY_CLIENT_SHOWS_MODULE = "derby-client-shows-module";

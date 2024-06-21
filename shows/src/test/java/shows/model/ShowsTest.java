@@ -17,8 +17,8 @@ import java.time.YearMonth;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static shows.builder.PersistenceUnit.DERBY_EMBEDDED_SHOWS_MODULE;
 import static shows.model.ForTests.SUPER_MOVIE_NAME;
+import static shows.model.PersistenceUnit.DERBY_EMBEDDED_SHOWS_MODULE;
 
 public class ShowsTest {
     private static final YearMonth JOSEUSER_CREDIT_CARD_EXPIRITY = YearMonth.of(
@@ -216,7 +216,7 @@ public class ShowsTest {
         });
         assertEquals(Shows.THEATER_ID_DOES_NOT_EXISTS, e.getMessage());
     }
-    
+
     private Shows createShowsSubSystem(DateTimeProvider dateTimeProvider, FakePublisher publisher) {
         return new Shows(emf,
                 tests.doNothingPaymentProvider(),

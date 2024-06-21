@@ -11,7 +11,7 @@ import users.api.AuthException;
 import users.api.UsersException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static users.builder.PersistenceUnit.DERBY_EMBEDDED_USERS_MODULE;
+import static users.model.PersistenceUnit.DERBY_EMBEDDED_USERS_MODULE;
 
 public class UsersTest {
 
@@ -24,6 +24,7 @@ public class UsersTest {
     private static EntityManagerFactory emf;
     private final ForTests tests = new ForTests();
 
+    //TODO: refactor test to use the builder
     @BeforeEach
     public void setUp() {
         emf = Persistence.createEntityManagerFactory(DERBY_EMBEDDED_USERS_MODULE);

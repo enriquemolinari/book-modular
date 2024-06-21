@@ -6,8 +6,8 @@ import jakarta.persistence.Persistence;
 import notifications.api.NotificationsSubSystem;
 import notifications.model.*;
 
-import static notifications.builder.PersistenceUnit.DERBY_CLIENT_NOTIFICATIONS_MODULE;
-import static notifications.builder.PersistenceUnit.DERBY_EMBEDDED_NOTIFICATIONS_MODULE;
+import static notifications.model.PersistenceUnit.DERBY_CLIENT_NOTIFICATIONS_MODULE;
+import static notifications.model.PersistenceUnit.DERBY_EMBEDDED_NOTIFICATIONS_MODULE;
 
 public class NotificationsSubSystemBuilder {
     private String environemnt;

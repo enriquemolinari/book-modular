@@ -1,4 +1,4 @@
-package users.builder;
+package users.model;
 
 public interface PersistenceUnit {
     String DERBY_CLIENT_USERS_MODULE = "derby-client-users-module";

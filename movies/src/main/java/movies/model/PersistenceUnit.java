@@ -1,4 +1,4 @@
-package movies.builder;
+package movies.model;
 
 public interface PersistenceUnit {
     String DERBY_CLIENT_MOVIES_MODULE = "derby-client-movies-module";

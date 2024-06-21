@@ -11,8 +11,8 @@ import shows.model.CreditCardPaymentProvider;
 import shows.model.PleasePayPaymentProvider;
 import shows.model.Shows;
 
-import static shows.builder.PersistenceUnit.DERBY_CLIENT_SHOWS_MODULE;
-import static shows.builder.PersistenceUnit.DERBY_EMBEDDED_SHOWS_MODULE;
+import static shows.model.PersistenceUnit.DERBY_CLIENT_SHOWS_MODULE;
+import static shows.model.PersistenceUnit.DERBY_EMBEDDED_SHOWS_MODULE;
 
 public class ShowsSubSystemBuilder {
     private final Publisher publisher;

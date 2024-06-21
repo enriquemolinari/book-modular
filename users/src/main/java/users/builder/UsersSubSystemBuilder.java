@@ -10,8 +10,8 @@ import users.api.UsersSubSystem;
 import users.model.PasetoToken;
 import users.model.Users;
 
-import static users.builder.PersistenceUnit.DERBY_CLIENT_USERS_MODULE;
-import static users.builder.PersistenceUnit.DERBY_EMBEDDED_USERS_MODULE;
+import static users.model.PersistenceUnit.DERBY_CLIENT_USERS_MODULE;
+import static users.model.PersistenceUnit.DERBY_EMBEDDED_USERS_MODULE;
 
 public class UsersSubSystemBuilder {
     private static final String SECRET = "nXXh3Xjr2T0ofFilg3kw8BwDEyHmS6OIe4cjWUm2Sm0=";

@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static movies.builder.PersistenceUnit.DERBY_EMBEDDED_MOVIES_MODULE;
 import static movies.model.ForTests.*;
+import static movies.model.PersistenceUnit.DERBY_EMBEDDED_MOVIES_MODULE;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MoviesTest {
