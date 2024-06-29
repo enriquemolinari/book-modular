@@ -1,10 +1,10 @@
-package events.impl;
+package publisher.impl;
 
-import events.api.EventListener;
-import events.api.data.movies.NewMovieEvent;
-import events.api.data.users.NewUserEvent;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
+import publisher.api.EventListener;
+import publisher.api.data.movies.NewMovieEvent;
+import publisher.api.data.users.NewUserEvent;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;

@@ -1,6 +1,6 @@
-package events.impl;
+package publisher.impl;
 
-import events.api.Event;
+import publisher.api.Event;
 
 public class AbstractEventListener {
     protected Event event;

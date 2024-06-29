@@ -1,6 +1,6 @@
-package events.api.data.users;
+package publisher.api.data.users;
 
-import events.api.Event;
+import publisher.api.Event;
 
 public record NewUserEvent(Long id, String username,
                            String email) implements Event {

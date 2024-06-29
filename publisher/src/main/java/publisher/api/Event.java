@@ -1,4 +1,4 @@
-package events.api;
+package publisher.api;
 
 public interface Event {
 }

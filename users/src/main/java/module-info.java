@@ -1,6 +1,6 @@
 module users {
     requires common;
-    requires events;
+    requires publisher;
 
     requires jakarta.persistence;
     requires lombok;

@@ -1,9 +1,9 @@
 package users.model;
 
-import events.api.Event;
-import events.api.EventListener;
-import events.api.Publisher;
 import jakarta.persistence.EntityManager;
+import publisher.api.Event;
+import publisher.api.EventListener;
+import publisher.api.Publisher;
 
 import java.util.ArrayList;
 import java.util.List;

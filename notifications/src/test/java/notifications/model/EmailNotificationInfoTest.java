@@ -1,7 +1,7 @@
 package notifications.model;
 
-import events.api.data.shows.TicketsSoldEvent;
 import org.junit.jupiter.api.Test;
+import publisher.api.data.shows.TicketsSoldEvent;
 
 import java.util.List;
 

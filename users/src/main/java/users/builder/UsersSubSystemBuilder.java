@@ -1,11 +1,11 @@
 package users.builder;
 
 import common.constants.Environment;
-import events.api.Event;
-import events.api.EventListener;
-import events.api.Publisher;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import publisher.api.Event;
+import publisher.api.EventListener;
+import publisher.api.Publisher;
 import users.api.UsersSubSystem;
 import users.model.PasetoToken;
 import users.model.Users;

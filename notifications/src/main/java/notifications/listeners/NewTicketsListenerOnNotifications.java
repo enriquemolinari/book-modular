@@ -1,12 +1,12 @@
 package notifications.listeners;
 
-import events.api.EventListener;
-import events.api.data.shows.TicketsSoldEvent;
 import jakarta.persistence.EntityManager;
 import notifications.model.EmailNotificationInfo;
 import notifications.model.NotificationJobInsertStmt;
 import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
+import publisher.api.EventListener;
+import publisher.api.data.shows.TicketsSoldEvent;
 
 import java.sql.Connection;
 

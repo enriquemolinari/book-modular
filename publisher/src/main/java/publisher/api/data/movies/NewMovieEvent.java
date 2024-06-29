@@ -1,6 +1,6 @@
-package events.api.data.movies;
+package publisher.api.data.movies;
 
-import events.api.Event;
+import publisher.api.Event;
 
 import java.time.LocalDate;
 import java.util.Set;

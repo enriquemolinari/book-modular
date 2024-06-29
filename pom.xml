@@ -14,7 +14,7 @@
         <module>users</module>
         <module>notifications</module>
         <module>common</module>
-        <module>events</module>
+        <module>publisher</module>
     </modules>
 
     <properties>

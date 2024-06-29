@@ -1,12 +1,12 @@
 package shows.model;
 
 import common.date.DateTimeProvider;
-import events.api.data.shows.TicketsSoldEvent;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import publisher.api.data.shows.TicketsSoldEvent;
 import shows.api.Seat;
 import shows.api.ShowsException;
 import shows.api.ShowsSubSystem;

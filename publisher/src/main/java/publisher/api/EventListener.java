@@ -1,4 +1,4 @@
-package events.api;
+package publisher.api;
 
 import jakarta.persistence.EntityManager;
 

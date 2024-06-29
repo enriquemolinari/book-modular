@@ -2,10 +2,10 @@ package notifications.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import events.api.data.shows.TicketsSoldEvent;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import publisher.api.data.shows.TicketsSoldEvent;
 
 import java.util.List;
 

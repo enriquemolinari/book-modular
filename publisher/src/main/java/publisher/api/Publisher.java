@@ -1,8 +1,8 @@
-package events.api;
+package publisher.api;
 
 
-import events.impl.EventPublisher;
 import jakarta.persistence.EntityManager;
+import publisher.impl.EventPublisher;
 
 public interface Publisher {
     static Publisher creates() {

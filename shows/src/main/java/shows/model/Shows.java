@@ -2,10 +2,10 @@ package shows.model;
 
 import common.date.DateTimeProvider;
 import common.db.Tx;
-import events.api.Publisher;
-import events.api.data.shows.TicketsSoldEvent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import publisher.api.Publisher;
+import publisher.api.data.shows.TicketsSoldEvent;
 import shows.api.*;
 
 import java.time.LocalDate;

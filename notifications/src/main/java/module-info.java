@@ -1,5 +1,5 @@
 module notifications {
-    requires events;
+    requires publisher;
     requires common;
 
     requires com.fasterxml.jackson.databind;

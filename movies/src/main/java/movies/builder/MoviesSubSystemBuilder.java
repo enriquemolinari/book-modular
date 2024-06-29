@@ -1,13 +1,13 @@
 package movies.builder;
 
 import common.constants.Environment;
-import events.api.Event;
-import events.api.EventListener;
-import events.api.Publisher;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import movies.api.MoviesSubSystem;
 import movies.model.Movies;
+import publisher.api.Event;
+import publisher.api.EventListener;
+import publisher.api.Publisher;
 
 import static movies.model.PersistenceUnit.DERBY_CLIENT_MOVIES_MODULE;
 import static movies.model.PersistenceUnit.DERBY_EMBEDDED_MOVIES_MODULE;

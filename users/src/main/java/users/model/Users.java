@@ -2,10 +2,10 @@ package users.model;
 
 import common.date.DateTimeProvider;
 import common.db.Tx;
-import events.api.Publisher;
-import events.api.data.users.NewUserEvent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import publisher.api.Publisher;
+import publisher.api.data.users.NewUserEvent;
 import users.api.AuthException;
 import users.api.UserProfile;
 import users.api.UsersException;

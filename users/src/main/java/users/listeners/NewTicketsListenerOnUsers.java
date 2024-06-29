@@ -1,10 +1,10 @@
 package users.listeners;
 
-import events.api.EventListener;
-import events.api.data.shows.TicketsSoldEvent;
 import jakarta.persistence.EntityManager;
 import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
+import publisher.api.EventListener;
+import publisher.api.data.shows.TicketsSoldEvent;
 import users.model.Schema;
 
 import java.sql.Connection;

@@ -1,12 +1,12 @@
 package users.model;
 
-import events.api.Publisher;
-import events.api.data.users.NewUserEvent;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import publisher.api.Publisher;
+import publisher.api.data.users.NewUserEvent;
 import users.api.AuthException;
 import users.api.UsersException;
 

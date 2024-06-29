@@ -1,13 +1,13 @@
 package movies.model;
 
 import common.db.Tx;
-import events.api.Publisher;
-import events.api.data.movies.NewMovieEvent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.NonUniqueResultException;
 import movies.api.*;
+import publisher.api.Publisher;
+import publisher.api.data.movies.NewMovieEvent;
 
 import java.time.LocalDate;
 import java.util.List;

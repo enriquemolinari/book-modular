@@ -1,9 +1,5 @@
 package movies.model;
 
-import events.api.Event;
-import events.api.EventListener;
-import events.api.Publisher;
-import events.api.data.movies.NewMovieEvent;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -13,6 +9,10 @@ import movies.api.MoviesException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import publisher.api.Event;
+import publisher.api.EventListener;
+import publisher.api.Publisher;
+import publisher.api.data.movies.NewMovieEvent;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
