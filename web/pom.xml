@@ -12,6 +12,7 @@
     <artifactId>web</artifactId>
 
     <properties>
+        <main.class>spring.main.Main</main.class>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -94,4 +95,17 @@
         </dependency>
 
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>${main.class}</mainClass>
+                    <skip>false</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

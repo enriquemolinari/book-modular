@@ -1,7 +1,7 @@
 ----------------------------------------------------------------
-Wed Jun 19 19:33:38 ART 2024:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.16.1.1 - (1901046): instance a816c00e-0190-32a2-5575-000002784120 
-on database directory memory:/home/enrique/git/multimodule/cinema with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@65b3120a 
+Mon Jul 01 21:20:52 ART 2024:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.16.1.1 - (1901046): instance a816c00e-0190-70d0-d24e-00000431b500 
+on database directory memory:/home/enrique/git/multimodule/cinema with class loader org.codehaus.mojo.exec.URLClassLoaderBuilder$ExecJavaClassLoader@77114efe 
 Loaded from file:/home/enrique/.m2/repository/org/apache/derby/derby/10.16.1.1/derby-10.16.1.1.jar
 java.vendor=Private Build
 java.runtime.version=17.0.10+7-Ubuntu-120.04.1
