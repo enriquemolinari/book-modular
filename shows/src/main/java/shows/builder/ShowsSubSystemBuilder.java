@@ -22,7 +22,7 @@ public class ShowsSubSystemBuilder {
         this.publisher = Publisher.creates();
     }
 
-    private static CreditCardPaymentProvider doNothingPaymentProvider() {
+    private CreditCardPaymentProvider doNothingPaymentProvider() {
         return (creditCardNumber, expire, securityCode, totalAmount) -> {
         };
     }

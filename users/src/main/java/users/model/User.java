@@ -20,9 +20,7 @@ import static users.model.Schema.*;
 public class User {
 
     static final String INVALID_USERNAME = "A valid username must be provided";
-    static final String CAN_NOT_CHANGE_PASSWORD = "Some of the provided information is not valid to change the password";
     static final String POINTS_MUST_BE_GREATER_THAN_ZERO = "Points must be greater than zero";
-    static final String PASSWORDS_MUST_BE_EQUALS = "Passwords must be equals";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -41,34 +39,23 @@ public class User {
 
     public User(String name, String surname, String email, String userName, String password,
                 String repeatPassword) {
-        checkPasswordsMatch(password, repeatPassword);
+        this.password = new Password(password);
+        this.password.checkPasswordsMatch(password, repeatPassword);
         this.name = name;
         this.surname = surname;
         this.email = new Email(email).asString();
         this.userName = new NotBlankString(userName,
                 new UsersException(INVALID_USERNAME)).value();
-        this.password = new Password(password);
         this.points = 0;
     }
 
-    private void checkPasswordsMatch(String password, String repeatPassword) {
-        if (!password.equals(repeatPassword)) {
-            throw new UsersException(PASSWORDS_MUST_BE_EQUALS);
-        }
-    }
-
     boolean hasPassword(String password) {
-        return this.password.equals(new Password(password));
+        return this.password.hasPassword(password);
     }
 
     public void changePassword(String currentPassword, String newPassword1,
                                String newPassword2) {
-        if (!hasPassword(currentPassword)) {
-            throw new UsersException(CAN_NOT_CHANGE_PASSWORD);
-        }
-        checkPasswordsMatch(newPassword2, newPassword1);
-
-        this.password = new Password(newPassword1);
+        this.password.change(currentPassword, newPassword1, newPassword2);
     }
 
     void newEarnedPoints(int points) {
