@@ -21,8 +21,8 @@ public class UsersTest {
     private static final String JOSEUSER_EMAIL = "jose@bla.com";
     private static final String JOSEUSER_USERNAME = "joseuser";
     private static final Long NON_EXISTENT_ID = -2L;
-    private static EntityManagerFactory emf;
     private final ForTests tests = new ForTests();
+    private EntityManagerFactory emf;
 
     //TODO: refactor test to use the builder
     @BeforeEach

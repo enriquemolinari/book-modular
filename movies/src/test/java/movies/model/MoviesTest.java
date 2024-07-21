@@ -39,8 +39,8 @@ public class MoviesTest {
     private static final String JOSEUSER_USERNAME = "joseuser";
     private static final Long NON_EXISTENT_ID = -2L;
     private static final String ANTONIOUSER_USERNAME = "antonio";
-    private static EntityManagerFactory emf;
     private final ForTests tests = new ForTests();
+    private EntityManagerFactory emf;
 
     private Movies createMoviesSubsystemWithPaging(int pageSize) {
         return new Movies(emf, pageSize, doNothingEventPubliser());

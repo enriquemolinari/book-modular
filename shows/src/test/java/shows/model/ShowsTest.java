@@ -27,8 +27,8 @@ public class ShowsTest {
     private static final String JOSEUSER_CREDIT_CARD_SEC_CODE = "145";
     private static final String JOSEUSER_CREDIT_CARD_NUMBER = "123-456-789";
     private static final Long NON_EXISTENT_ID = -2L;
-    private static EntityManagerFactory emf;
     private final ForTests tests = new ForTests();
+    private EntityManagerFactory emf;
 
     @BeforeEach
     public void setUp() {

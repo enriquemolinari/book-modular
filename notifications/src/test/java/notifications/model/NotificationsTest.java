@@ -20,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class NotificationsTest {
-    private static EntityManagerFactory emf;
     private final String json1 = "{\"idUser\":1,\"pointsWon\":10,\"total\":100.0,\"payedSeats\":[1,2,3],\"movieName\":\"movie name\",\"showStartTime\":\"28/09 10:40\"}";
+    private EntityManagerFactory emf;
 
     @BeforeEach
     public void setUp() {
