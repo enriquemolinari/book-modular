@@ -104,7 +104,7 @@ public class Shows implements ShowsSubSystem {
             var ticket = new Cashier(this.paymentGateway).paySeatsFor(selectedSeats,
                     showTime,
                     user,
-                    Creditcard.of(creditCardNumber, expirationDate, secturityCode));
+                    CreditCard.of(creditCardNumber, expirationDate, secturityCode));
             this.publisher.notify(em, new TicketsSoldEvent(userId,
                     ticket.getPointsWon(),
                     ticket.total(),
@@ -145,7 +145,6 @@ public class Shows implements ShowsSubSystem {
         return findByIdOrThrows(ShowTime.class, id, SHOW_TIME_ID_NOT_EXISTS, em);
     }
 
-    //TODO remover ese find duplicado
     <T> T findByIdOrThrows(Class<T> entity, Long id, String msg, EntityManager em) {
         var e = em.find(entity, id);
         if (e == null) {
