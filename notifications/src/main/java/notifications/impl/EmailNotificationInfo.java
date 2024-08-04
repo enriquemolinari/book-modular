@@ -1,4 +1,4 @@
-package notifications.model;
+package notifications.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

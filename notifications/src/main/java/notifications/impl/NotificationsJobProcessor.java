@@ -1,4 +1,4 @@
-package notifications.model;
+package notifications.impl;
 
 import common.db.Tx;
 import jakarta.persistence.EntityManagerFactory;

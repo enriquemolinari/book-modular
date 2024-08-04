@@ -1,4 +1,4 @@
-package notifications.model;
+package notifications.impl;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -9,7 +9,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 import static java.lang.String.valueOf;
-import static notifications.model.Schema.*;
+import static notifications.impl.Schema.*;
 
 @Entity
 @Table(name = JOBS_ENTITY_TABLE_NAME, schema = DATABASE_SCHEMA_NAME)

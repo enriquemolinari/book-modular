@@ -1,4 +1,4 @@
-package notifications.model;
+package notifications.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;

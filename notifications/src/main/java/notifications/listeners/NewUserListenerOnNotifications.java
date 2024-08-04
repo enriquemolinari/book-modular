@@ -7,7 +7,7 @@ import publisher.api.data.users.NewUserEvent;
 
 import java.sql.PreparedStatement;
 
-import static notifications.model.Schema.*;
+import static notifications.impl.Schema.*;
 
 public class NewUserListenerOnNotifications implements EventListener<NewUserEvent> {
     @Override

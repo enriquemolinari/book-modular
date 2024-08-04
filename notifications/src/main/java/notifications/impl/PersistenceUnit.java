@@ -1,4 +1,4 @@
-package notifications.model;
+package notifications.impl;
 
 public interface PersistenceUnit {
     String DERBY_CLIENT_NOTIFICATIONS_MODULE = "derby-client-notifications-module";

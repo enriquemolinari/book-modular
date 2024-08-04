@@ -1,4 +1,4 @@
-package notifications.model;
+package notifications.impl;
 
 public interface Schema {
     String DATABASE_SCHEMA_NAME = "notifications";

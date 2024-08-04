@@ -1,4 +1,4 @@
-package notifications.model;
+package notifications.impl;
 
 import org.junit.jupiter.api.Test;
 import publisher.api.data.shows.TicketsSoldEvent;

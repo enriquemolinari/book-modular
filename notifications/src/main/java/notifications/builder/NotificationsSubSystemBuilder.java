@@ -4,10 +4,10 @@ import common.constants.Environment;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import notifications.api.NotificationsSubSystem;
-import notifications.model.*;
+import notifications.impl.*;
 
-import static notifications.model.PersistenceUnit.DERBY_CLIENT_NOTIFICATIONS_MODULE;
-import static notifications.model.PersistenceUnit.DERBY_EMBEDDED_NOTIFICATIONS_MODULE;
+import static notifications.impl.PersistenceUnit.DERBY_CLIENT_NOTIFICATIONS_MODULE;
+import static notifications.impl.PersistenceUnit.DERBY_EMBEDDED_NOTIFICATIONS_MODULE;
 
 public class NotificationsSubSystemBuilder {
     private String environemnt;

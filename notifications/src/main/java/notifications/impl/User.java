@@ -1,4 +1,4 @@
-package notifications.model;
+package notifications.impl;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -7,7 +7,7 @@ import jakarta.persistence.Table;
 import lombok.*;
 
 import static java.lang.String.valueOf;
-import static notifications.model.Schema.*;
+import static notifications.impl.Schema.*;
 
 @Entity
 @Table(name = USER_ENTITY_TABLE_NAME, schema = DATABASE_SCHEMA_NAME)

@@ -1,4 +1,4 @@
-package notifications.model;
+package notifications.impl;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-import static notifications.model.Schema.*;
+import static notifications.impl.Schema.*;
 
 public class NotificationJobInsertStmt {
 

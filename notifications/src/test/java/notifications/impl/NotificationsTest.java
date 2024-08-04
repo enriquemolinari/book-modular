@@ -1,4 +1,4 @@
-package notifications.model;
+package notifications.impl;
 
 import common.db.Tx;
 import jakarta.persistence.EntityManagerFactory;
@@ -14,8 +14,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static notifications.model.NewSaleEmailTemplate.EMAIL_SUBJECT_SALE;
-import static notifications.model.PersistenceUnit.DERBY_EMBEDDED_NOTIFICATIONS_MODULE;
+import static notifications.impl.NewSaleEmailTemplate.EMAIL_SUBJECT_SALE;
+import static notifications.impl.PersistenceUnit.DERBY_EMBEDDED_NOTIFICATIONS_MODULE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

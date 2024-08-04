@@ -2,7 +2,7 @@ package notifications.builder;
 
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
-import notifications.model.User;
+import notifications.impl.User;
 
 class SetUpDb {
     private final EntityManagerFactory emf;

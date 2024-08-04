@@ -1,4 +1,4 @@
-package notifications.model;
+package notifications.impl;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
