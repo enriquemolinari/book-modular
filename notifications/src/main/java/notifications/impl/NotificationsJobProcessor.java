@@ -1,6 +1,5 @@
 package notifications.impl;
 
-import common.db.Tx;
 import jakarta.persistence.EntityManagerFactory;
 
 import java.util.HashSet;
@@ -21,7 +20,7 @@ public class NotificationsJobProcessor {
         var allJobs = jpaSession.inSession((em) -> new AllJobsRetriever(em).getAllJobs());
         allJobs.forEach(
                 (job) -> {
-                    new Tx(emf).inTx(em -> {
+                    emf.runInTransaction(em -> {
                         var info = job.asInfo();
                         var user = new UserRetriever(em).userRetriever(info.getIdUser());
                         notificationSender
