@@ -4,9 +4,9 @@
 
 - `git clone https://github.com/enriquemolinari/book-modular.git`
 - `cd book-modular`
-- To compile and install all dependencies: `mvn install`
-- To run all tests: `mvn test`
-- To start the application: `mvn exec:java`. It will start SpringBoot and set up every module. A sample movie data is
+- To compile and install all dependencies: `./mvnw install`
+- To run all tests: `./mvnw test`
+- To start the application: `./mvnw exec:java`. It will start SpringBoot and set up every module. A sample movie data is
   loaded at startup.
     - Once started, you can open swagger UI:
     - http://localhost:8080/swagger-ui/index.html

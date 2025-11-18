@@ -2,14 +2,13 @@ package notifications.builder;
 
 import common.constants.Environment;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 import notifications.api.NotificationsSubSystem;
 import notifications.impl.*;
 
-import static notifications.impl.PersistenceUnit.DERBY_CLIENT_NOTIFICATIONS_MODULE;
-import static notifications.impl.PersistenceUnit.DERBY_EMBEDDED_NOTIFICATIONS_MODULE;
-
 public class NotificationsSubSystemBuilder {
+    private static final String DB_NAME = "cinema";
+    private static final String HOST = "localhost";
+    private static final String DB_PORT = "1527";
     private String environemnt;
     private boolean startBackgroundJob;
 
@@ -30,10 +29,16 @@ public class NotificationsSubSystemBuilder {
 
     public NotificationsSubSystem build() {
         if (isProd()) {
-            var emf = createEntityManagerFactory(DERBY_CLIENT_NOTIFICATIONS_MODULE);
+            var emf = new EmfBuilder()
+                    .clientAndServer(DB_NAME, HOST, DB_PORT)
+                    .build();
             return notifications(emf);
         }
-        var emf = createEntityManagerFactory(DERBY_EMBEDDED_NOTIFICATIONS_MODULE);
+        var emf = new EmfBuilder()
+                .memory()
+                .withDropAndCreateDDL()
+                .debugQueries()
+                .build();
         new SetUpDb(emf).createSchemaAndPopulateSampleData();
         return notifications(emf);
     }
@@ -54,10 +59,5 @@ public class NotificationsSubSystemBuilder {
 
     private boolean isProd() {
         return this.environemnt.equals(Environment.ENVIRONMENT_PROD);
-    }
-
-    private EntityManagerFactory createEntityManagerFactory(String persistenceUnitName) {
-        return Persistence
-                .createEntityManagerFactory(persistenceUnitName);
     }
 }

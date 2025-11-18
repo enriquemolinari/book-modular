@@ -1,36 +1,36 @@
 package notifications.impl;
 
-import common.db.Tx;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
+import notifications.builder.EmfBuilder;
 import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static notifications.impl.NewSaleEmailTemplate.EMAIL_SUBJECT_SALE;
-import static notifications.impl.PersistenceUnit.DERBY_EMBEDDED_NOTIFICATIONS_MODULE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class NotificationsTest {
+    private static EntityManagerFactory emf;
     private final String json1 = "{\"idUser\":1,\"pointsWon\":10,\"total\":100.0,\"payedSeats\":[1,2,3],\"movieName\":\"movie name\",\"showStartTime\":\"28/09 10:40\"}";
-    private EntityManagerFactory emf;
 
-    @BeforeEach
-    public void setUp() {
-        emf = Persistence.createEntityManagerFactory(DERBY_EMBEDDED_NOTIFICATIONS_MODULE);
+    @BeforeAll
+    public static void setUp() {
+        emf = new EmfBuilder()
+                .memory()
+                .withDropAndCreateDDL()
+                .build();
     }
 
     @AfterEach
     public void tearDown() {
-        emf.close();
+        emf.getSchemaManager().truncate();
     }
 
     @Test
@@ -56,7 +56,7 @@ public class NotificationsTest {
         calls.add(new String[]{"username1@mail.com",
                 EMAIL_SUBJECT_SALE,
                 expectedBody});
-        assertEquals("username1@mail.com", fakeEmailProvider.invokedWith().get(0)[0]);
+        assertEquals("username1@mail.com", fakeEmailProvider.invokedWith().getFirst()[0]);
         assertEquals(EMAIL_SUBJECT_SALE, fakeEmailProvider.invokedWith().get(0)[1]);
         assertEquals(expectedBody, fakeEmailProvider.invokedWith().get(0)[2]);
         assertEquals("username1@mail.com", fakeEmailProvider.invokedWith().get(1)[0]);
@@ -94,11 +94,11 @@ public class NotificationsTest {
     }
 
     private void insertJob(String emailNotificationInfo) {
-        new Tx(emf).inTx((em) -> {
+        emf.runInTransaction((em) -> {
             Session session = em.unwrap(Session.class);
             session.doWork(new Work() {
                 @Override
-                public void execute(Connection connection) throws SQLException {
+                public void execute(Connection connection) {
                     new NotificationJobInsertStmt().insertJobStmt(connection, emailNotificationInfo);
                 }
             });
@@ -106,7 +106,7 @@ public class NotificationsTest {
     }
 
     private void createUser(Long userId, String username, String email) {
-        new Tx(emf).inTx(em -> {
+        emf.runInTransaction(em -> {
             em.persist(new User(userId, username, email));
         });
     }

@@ -2,12 +2,12 @@ package movies.model;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 import movies.api.Genre;
 import movies.api.MovieInfo;
 import movies.api.MoviesException;
+import movies.builder.EmfBuilder;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import publisher.api.Event;
 import publisher.api.EventListener;
@@ -15,32 +15,30 @@ import publisher.api.Publisher;
 import publisher.api.data.movies.NewMovieEvent;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import static movies.model.ForTests.*;
-import static movies.model.PersistenceUnit.DERBY_EMBEDDED_MOVIES_MODULE;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MoviesTest {
 
-    private static final String JOSEUSER_SURNAME = "aSurname";
-    private static final String JOSEUSER_NAME = "Jose";
-    private static final String JOSEUSER_PASS = "password12345679";
-    private static final String JOSEUSER_EMAIL = "jose@bla.com";
-    private static final YearMonth JOSEUSER_CREDIT_CARD_EXPIRITY = YearMonth.of(
-            LocalDateTime.now().getYear(),
-            LocalDateTime.now().plusMonths(2).getMonth());
-    private static final String JOSEUSER_CREDIT_CARD_SEC_CODE = "145";
-    private static final String JOSEUSER_CREDIT_CARD_NUMBER = "123-456-789";
     private static final String JOSEUSER_USERNAME = "joseuser";
     private static final Long NON_EXISTENT_ID = -2L;
     private static final String ANTONIOUSER_USERNAME = "antonio";
+    private static EntityManagerFactory emf;
     private final ForTests tests = new ForTests();
-    private EntityManagerFactory emf;
+
+    @BeforeAll
+    public static void setUp() {
+        emf = new EmfBuilder().memory().withDropAndCreateDDL().build();
+    }
+
+    @AfterEach
+    public void tearDown() {
+        emf.getSchemaManager().truncate();
+    }
 
     private Movies createMoviesSubsystemWithPaging(int pageSize) {
         return new Movies(emf, pageSize, doNothingEventPubliser());
@@ -48,11 +46,6 @@ public class MoviesTest {
 
     private Movies createMoviesSubsystem(Publisher publisher) {
         return new Movies(emf, publisher);
-    }
-
-    @BeforeEach
-    public void setUp() {
-        emf = Persistence.createEntityManagerFactory(DERBY_EMBEDDED_MOVIES_MODULE);
     }
 
     @Test
@@ -211,11 +204,6 @@ public class MoviesTest {
 
     private Long registerAUser(Movies movies) {
         return movies.addNewUser(3L, "username");
-    }
-
-    @AfterEach
-    public void tearDown() {
-        emf.close();
     }
 
     public Publisher doNothingEventPubliser() {

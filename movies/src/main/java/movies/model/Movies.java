@@ -36,7 +36,7 @@ public class Movies implements MoviesSubSystem {
 
     @Override
     public MovieInfo movie(Long id) {
-        return new Tx(this.emf).inTx(em -> {
+        return emf.callInTransaction(em -> {
             try {
                 return movieWithActorsById(id, em);
             } catch (NonUniqueResultException | NoResultException e) {
@@ -58,7 +58,7 @@ public class Movies implements MoviesSubSystem {
     @Override
     public MovieInfo addNewMovie(String name, int duration,
                                  LocalDate releaseDate, String plot, Set<Genre> genres) {
-        return new Tx(this.emf).inTx(em -> {
+        return emf.callInTransaction(em -> {
             var movie = new Movie(name, plot, duration, releaseDate, genres);
             em.persist(movie);
             this.publisher.notify(em, new NewMovieEvent(movie.id(),
@@ -73,7 +73,7 @@ public class Movies implements MoviesSubSystem {
     @Override
     public MovieInfo addActorTo(Long movieId, String name, String surname,
                                 String email, String characterName) {
-        return new Tx(this.emf).inTx(em -> {
+        return emf.callInTransaction(em -> {
             var movie = em.getReference(Movie.class, movieId);
             movie.addAnActor(name, surname, email, characterName);
             return movie.toInfo();
@@ -83,7 +83,7 @@ public class Movies implements MoviesSubSystem {
     @Override
     public MovieInfo addDirectorToMovie(Long movieId, String name,
                                         String surname, String email) {
-        return new Tx(this.emf).inTx(em -> {
+        return emf.callInTransaction(em -> {
             var movie = em.getReference(Movie.class, movieId);
             movie.addADirector(name, surname, email);
             return movie.toInfo();
@@ -135,7 +135,7 @@ public class Movies implements MoviesSubSystem {
     public List<UserMovieRate> pagedRatesOfOrderedDate(Long movieId,
                                                        int pageNumber) {
         checkPageNumberIsGreaterThanZero(pageNumber);
-        return new Tx(emf).inTx(em -> {
+        return emf.callInTransaction(em -> {
             var q = em.createQuery(
                     "select ur from UserRate ur "
                             + "where ur.movie.id = ?1 "
@@ -153,7 +153,7 @@ public class Movies implements MoviesSubSystem {
     public List<MovieInfo> pagedSearchMovieByName(String fullOrPartmovieName,
                                                   int pageNumber) {
         checkPageNumberIsGreaterThanZero(pageNumber);
-        return new Tx(emf).inTx(em -> {
+        return emf.callInTransaction(em -> {
             var q = em.createQuery(
                     "select m from Movie m "
                             // a trigram index is required
@@ -188,7 +188,7 @@ public class Movies implements MoviesSubSystem {
     private List<MovieInfo> pagedMoviesSortedBy(int pageNumber,
                                                 String orderByClause) {
         checkPageNumberIsGreaterThanZero(pageNumber);
-        return new Tx(this.emf).inTx(em -> {
+        return emf.callInTransaction(em -> {
             var q = em.createQuery(
                     "select m from Movie m "
                             + orderByClause,
@@ -200,7 +200,7 @@ public class Movies implements MoviesSubSystem {
     }
 
     Long addNewUser(Long id, String username) {
-        return new Tx(this.emf).inTx(em -> {
+        return emf.callInTransaction(em -> {
             em.persist(new User(id, username));
             return id;
         });

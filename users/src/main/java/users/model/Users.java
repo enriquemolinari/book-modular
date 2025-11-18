@@ -36,7 +36,7 @@ public class Users implements UsersSubSystem {
 
     @Override
     public String login(String username, String password) {
-        return new Tx(emf).inTx(em -> {
+        return emf.callInTransaction(em -> {
             var q = em.createQuery(
                     "select u from User u where u.userName = ?1 and u.password.password = ?2",
                     User.class);
@@ -46,7 +46,7 @@ public class Users implements UsersSubSystem {
             if (mightBeAUser.isEmpty()) {
                 throw new AuthException(USER_OR_PASSWORD_ERROR);
             }
-            var user = mightBeAUser.get(0);
+            var user = mightBeAUser.getFirst();
             em.persist(new LoginAudit(this.dateTimeProvider.now(), user));
             return token.tokenFrom(user.toMap());
         });
@@ -85,7 +85,7 @@ public class Users implements UsersSubSystem {
 
     @Override
     public UserProfile profileFrom(Long userId) {
-        return new Tx(emf).inTx(em -> {
+        return emf.callInTransaction(em -> {
             return userBy(userId, em).toProfile();
         });
     }
@@ -93,7 +93,7 @@ public class Users implements UsersSubSystem {
     @Override
     public void changePassword(Long userId, String currentPassword,
                                String newPassword1, String newPassword2) {
-        new Tx(emf).inTx(em -> {
+        emf.runInTransaction(em -> {
             userBy(userId, em).changePassword(currentPassword, newPassword1,
                     newPassword2);
         });

@@ -13,11 +13,6 @@ public class JpaSession {
     }
 
     public <T> T inSession(Function<EntityManager, T> toExecute) {
-        EntityManager em = emf.createEntityManager();
-        try {
-            return toExecute.apply(em);
-        } finally {
-            em.close();
-        }
+        return emf.callInTransaction(toExecute);
     }
 }

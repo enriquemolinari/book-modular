@@ -10,10 +10,10 @@ import users.api.UsersSubSystem;
 import users.model.PasetoToken;
 import users.model.Users;
 
-import static users.model.PersistenceUnit.DERBY_CLIENT_USERS_MODULE;
-import static users.model.PersistenceUnit.DERBY_EMBEDDED_USERS_MODULE;
-
 public class UsersSubSystemBuilder {
+    public static final String DB_NAME = "cinema";
+    public static final String HOST = "locahost";
+    public static final String PORT = "1527";
     private static final String SECRET = "nXXh3Xjr2T0ofFilg3kw8BwDEyHmS6OIe4cjWUm2Sm0=";
     private final Publisher publisher;
     private String environemnt;
@@ -39,10 +39,10 @@ public class UsersSubSystemBuilder {
 
     public UsersSubSystem build() {
         if (isProd()) {
-            var emf = createEntityManagerFactory(DERBY_CLIENT_USERS_MODULE);
+            var emf = new EmfBuilder().clientAndServer(DB_NAME, HOST, PORT).build();
             return createUsersSubSystem(emf);
         }
-        var emf = createEntityManagerFactory(DERBY_EMBEDDED_USERS_MODULE);
+        var emf = new EmfBuilder().memory().withDropAndCreateDDL().build();
         new SetUpDb(emf).createSchemaAndPopulateSampleData();
         return createUsersSubSystem(emf);
     }

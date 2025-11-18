@@ -2,17 +2,16 @@ package movies.builder;
 
 import common.constants.Environment;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 import movies.api.MoviesSubSystem;
 import movies.model.Movies;
 import publisher.api.Event;
 import publisher.api.EventListener;
 import publisher.api.Publisher;
 
-import static movies.model.PersistenceUnit.DERBY_CLIENT_MOVIES_MODULE;
-import static movies.model.PersistenceUnit.DERBY_EMBEDDED_MOVIES_MODULE;
-
 public class MoviesSubSystemBuilder {
+    public static final String HOST = "localhost";
+    public static final String DB_PORT = "1527";
+    public static final String DB_NAME = "cinema";
     private final Publisher publisher;
     private String environemnt;
 
@@ -37,10 +36,16 @@ public class MoviesSubSystemBuilder {
 
     public MoviesSubSystem build() {
         if (isProd()) {
-            var emf = createEntityManagerFactory(DERBY_CLIENT_MOVIES_MODULE);
+            var emf = new EmfBuilder()
+                    .clientAndServer(DB_NAME, HOST, DB_PORT)
+                    .build();
             return moviesSubsystem(emf);
         }
-        var emf = createEntityManagerFactory(DERBY_EMBEDDED_MOVIES_MODULE);
+        var emf = new EmfBuilder()
+                .memory()
+                .withDropAndCreateDDL()
+                .debugQueries()
+                .build();
         new SetUpDb(emf).createSchemaAndPopulateSampleData();
         return moviesSubsystem(emf);
     }
@@ -53,8 +58,4 @@ public class MoviesSubSystemBuilder {
         return new Movies(emf, this.publisher);
     }
 
-    private EntityManagerFactory createEntityManagerFactory(String persistenceUnitName) {
-        return Persistence
-                .createEntityManagerFactory(persistenceUnitName);
-    }
 }

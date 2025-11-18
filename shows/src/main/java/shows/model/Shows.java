@@ -1,7 +1,6 @@
 package shows.model;
 
 import common.date.DateTimeProvider;
-import common.db.Tx;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import publisher.api.Publisher;
@@ -41,7 +40,7 @@ public class Shows implements ShowsSubSystem {
 
     @Override
     public List<MovieShows> showsUntil(LocalDateTime untilTo) {
-        return new Tx(emf).inTx(em -> {
+        return emf.callInTransaction(em -> {
             return movieShowsUntil(untilTo, em);
         });
     }
@@ -62,7 +61,7 @@ public class Shows implements ShowsSubSystem {
 
     @Override
     public Long addNewTheater(String name, Set<Integer> seatsNumbers) {
-        return new Tx(emf).inTx(em -> {
+        return emf.callInTransaction(em -> {
             var theater = new Theater(name, seatsNumbers);
             em.persist(theater);
             return theater.id();
@@ -72,7 +71,7 @@ public class Shows implements ShowsSubSystem {
     @Override
     public ShowInfo addNewShowFor(Long movieId, LocalDateTime startTime,
                                   float price, Long theaterId, int pointsToWin) {
-        return new Tx(emf).inTx(em -> {
+        return emf.callInTransaction(em -> {
             var movie = movieBy(movieId, em);
             var theatre = theatreBy(theaterId, em);
             var showTime = new ShowTime(movie, startTime, price, theatre,
@@ -85,7 +84,7 @@ public class Shows implements ShowsSubSystem {
     @Override
     public DetailedShowInfo reserve(Long buyerId, Long showTimeId,
                                     Set<Integer> selectedSeats) {
-        return new Tx(emf).inTx(em -> {
+        return emf.callInTransaction(em -> {
             ShowTime showTime = showTimeBy(showTimeId, em);
             var user = buyerBy(buyerId, em);
             showTime.reserveSeatsFor(user, selectedSeats,
@@ -98,7 +97,7 @@ public class Shows implements ShowsSubSystem {
     public Ticket pay(Long userId, Long showTimeId, Set<Integer> selectedSeats,
                       String creditCardNumber, YearMonth expirationDate,
                       String secturityCode) {
-        return new Tx(emf).inTx(em -> {
+        return emf.callInTransaction(em -> {
             ShowTime showTime = showTimeBy(showTimeId, em);
             var user = buyerBy(userId, em);
             var ticket = new Cashier(this.paymentGateway).paySeatsFor(selectedSeats,
@@ -116,14 +115,14 @@ public class Shows implements ShowsSubSystem {
     }
 
     Long addNewMovie(Long id, String name, int duration, LocalDate releaseDate, Set<String> genres) {
-        return new Tx(emf).inTx(em -> {
+        return emf.callInTransaction(em -> {
             em.persist(new Movie(id, name, duration, releaseDate, genres));
             return id;
         });
     }
 
     Long addNewBuyer(Long id) {
-        return new Tx(emf).inTx(em -> {
+        return emf.callInTransaction(em -> {
             em.persist(new Buyer(id));
             return id;
         });
@@ -155,7 +154,7 @@ public class Shows implements ShowsSubSystem {
 
     @Override
     public DetailedShowInfo show(Long id) {
-        return new Tx(emf).inTx(em -> {
+        return emf.callInTransaction(em -> {
             var show = showTimeBy(id, em);
             return show.toDetailedInfo();
         });

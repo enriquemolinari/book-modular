@@ -2,7 +2,6 @@ package shows.builder;
 
 import common.constants.Environment;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 import publisher.api.Event;
 import publisher.api.EventListener;
 import publisher.api.Publisher;
@@ -11,10 +10,10 @@ import shows.model.CreditCardPaymentProvider;
 import shows.model.PleasePayPaymentProvider;
 import shows.model.Shows;
 
-import static shows.model.PersistenceUnit.DERBY_CLIENT_SHOWS_MODULE;
-import static shows.model.PersistenceUnit.DERBY_EMBEDDED_SHOWS_MODULE;
-
 public class ShowsSubSystemBuilder {
+    public static final String DB_NAME = "cinema";
+    public static final String HOST = "localhost";
+    public static final String PORT = "1527";
     private final Publisher publisher;
     private String environemnt;
 
@@ -44,10 +43,12 @@ public class ShowsSubSystemBuilder {
 
     public ShowsSubSystem build() {
         if (isProd()) {
-            var emf = createEntityManagerFactory(DERBY_CLIENT_SHOWS_MODULE);
+            var emf = new EmfBuilder()
+                    .clientAndServer(DB_NAME, HOST, PORT)
+                    .build();
             return showsSubsystem(emf, new PleasePayPaymentProvider());
         }
-        var emf = createEntityManagerFactory(DERBY_EMBEDDED_SHOWS_MODULE);
+        var emf = new EmfBuilder().memory().withDropAndCreateDDL().build();
         new SetUpDb(emf).createSchemaAndPopulateSampleData();
         return showsSubsystem(emf, doNothingPaymentProvider());
     }
@@ -58,10 +59,5 @@ public class ShowsSubSystemBuilder {
 
     private Shows showsSubsystem(EntityManagerFactory emf, CreditCardPaymentProvider paymentProvider) {
         return new Shows(emf, paymentProvider, this.publisher);
-    }
-
-    private EntityManagerFactory createEntityManagerFactory(String persistenceUnitName) {
-        return Persistence
-                .createEntityManagerFactory(persistenceUnitName);
     }
 }

@@ -2,14 +2,14 @@ package shows.model;
 
 import common.date.DateTimeProvider;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import publisher.api.data.shows.TicketsSoldEvent;
 import shows.api.Seat;
 import shows.api.ShowsException;
 import shows.api.ShowsSubSystem;
+import shows.builder.EmfBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,7 +18,6 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static shows.model.ForTests.SUPER_MOVIE_NAME;
-import static shows.model.PersistenceUnit.DERBY_EMBEDDED_SHOWS_MODULE;
 
 public class ShowsTest {
     private static final YearMonth JOSEUSER_CREDIT_CARD_EXPIRITY = YearMonth.of(
@@ -27,13 +26,19 @@ public class ShowsTest {
     private static final String JOSEUSER_CREDIT_CARD_SEC_CODE = "145";
     private static final String JOSEUSER_CREDIT_CARD_NUMBER = "123-456-789";
     private static final Long NON_EXISTENT_ID = -2L;
+    private static EntityManagerFactory emf;
     private final ForTests tests = new ForTests();
-    private EntityManagerFactory emf;
 
-    @BeforeEach
-    public void setUp() {
-        emf = Persistence.createEntityManagerFactory(DERBY_EMBEDDED_SHOWS_MODULE);
+    @BeforeAll
+    public static void setUp() {
+        emf = new EmfBuilder().memory().withDropAndCreateDDL().build();
     }
+
+    @AfterEach
+    public void tearDown() {
+        emf.getSchemaManager().truncate();
+    }
+
 
     @Test
     public void reservationHasExpired() {
@@ -235,10 +240,4 @@ public class ShowsTest {
         return shows.addNewTheater("a Theater",
                 Set.of(1, 2, 3, 4, 5, 6));
     }
-
-    @AfterEach
-    public void tearDown() {
-        emf.close();
-    }
-
 }

@@ -1,17 +1,16 @@
 package users.model;
 
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import publisher.api.Publisher;
 import publisher.api.data.users.NewUserEvent;
 import users.api.AuthException;
 import users.api.UsersException;
+import users.builder.EmfBuilder;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static users.model.PersistenceUnit.DERBY_EMBEDDED_USERS_MODULE;
 
 public class UsersTest {
 
@@ -21,13 +20,18 @@ public class UsersTest {
     private static final String JOSEUSER_EMAIL = "jose@bla.com";
     private static final String JOSEUSER_USERNAME = "joseuser";
     private static final Long NON_EXISTENT_ID = -2L;
+    private static EntityManagerFactory emf;
     private final ForTests tests = new ForTests();
-    private EntityManagerFactory emf;
 
-    //TODO: refactor test to use the builder
-    @BeforeEach
-    public void setUp() {
-        emf = Persistence.createEntityManagerFactory(DERBY_EMBEDDED_USERS_MODULE);
+    @BeforeAll
+    public static void setUp() {
+        emf = new EmfBuilder().memory().withDropAndCreateDDL().debugQueries()
+                .build();
+    }
+
+    @AfterEach
+    public void tearDown() {
+        emf.getSchemaManager().truncate();
     }
 
 
@@ -125,10 +129,4 @@ public class UsersTest {
                 JOSEUSER_USERNAME,
                 JOSEUSER_PASS, JOSEUSER_PASS);
     }
-
-    @AfterEach
-    public void tearDown() {
-        emf.close();
-    }
-
 }

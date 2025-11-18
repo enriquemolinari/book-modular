@@ -14,4 +14,7 @@ module web {
     requires spring.context;
     requires spring.beans;
     requires spring.boot.autoconfigure;
+//    requires org.springdoc.openapi.common;
+//    requires org.springdoc.openapi.webmvc.core;
+//    requires org.springdoc.openapi.ui;
 }

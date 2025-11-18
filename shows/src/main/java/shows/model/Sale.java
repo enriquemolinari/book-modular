@@ -20,7 +20,7 @@ import static shows.model.Schema.DATABASE_SCHEMA_NAME;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Setter(value = AccessLevel.PRIVATE)
 @Getter(value = AccessLevel.PRIVATE)
-class Sale {
+public class Sale {
 
     public static final String SALE_CANNOT_BE_CREATED_WITHOUT_SEATS = "Sale cannot be created without seats";
     @Id
