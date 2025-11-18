@@ -1,5 +1,8 @@
 # Cinema Ticket System
 
+This repository contains the implementation of the Cinema Ticket System following a modular-monolith architecture. Each
+module applies a rich domain model to structure its business logic.
+
 ## Modular Monolith Architecture Style
 
 - `git clone https://github.com/enriquemolinari/book-modular.git`
