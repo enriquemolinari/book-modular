@@ -1,11 +1,11 @@
 package shows.listeners;
 
 import jakarta.persistence.EntityManager;
-import org.hibernate.Session;
 import publisher.api.EventListener;
 import publisher.api.data.movies.NewMovieEvent;
 import shows.model.Schema;
 
+import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 
@@ -14,8 +14,7 @@ import static shows.model.Schema.*;
 public class NewMovieListenerOnShows implements EventListener<NewMovieEvent> {
     @Override
     public void update(EntityManager em, NewMovieEvent info) {
-        Session session = em.unwrap(Session.class);
-        session.doWork(conn -> {
+        em.<Connection>runWithConnection(conn -> {
             //cannot use EntityManager here, it comes from the Context of another module
             //we don't share entityes between modules
             String insertStmt = "insert into " + DATABASE_SCHEMA_NAME + "."

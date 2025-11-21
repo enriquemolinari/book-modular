@@ -5,6 +5,7 @@ module movies {
     requires jakarta.persistence;
     requires lombok;
     requires org.hibernate.orm.core;
+    requires java.sql;
     opens movies.model to org.hibernate.orm.core;
 
     //even that only web use the module api, its classes might require to be

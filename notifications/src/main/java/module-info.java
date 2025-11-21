@@ -6,6 +6,7 @@ module notifications {
     requires jakarta.persistence;
     requires lombok;
     requires org.hibernate.orm.core;
+    requires java.sql;
     opens notifications.impl to org.hibernate.orm.core, com.fasterxml.jackson.databind;
 
     exports notifications.api to web;

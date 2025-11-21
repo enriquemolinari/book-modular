@@ -6,6 +6,7 @@ module users {
     requires lombok;
     requires org.hibernate.orm.core;
     requires dev.paseto.jpaseto.api;
+    requires java.sql;
     opens users.model to org.hibernate.orm.core;
 
     exports users.api;

@@ -2,10 +2,10 @@ package movies.listeners;
 
 import jakarta.persistence.EntityManager;
 import movies.model.Schema;
-import org.hibernate.Session;
 import publisher.api.EventListener;
 import publisher.api.data.users.NewUserEvent;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 
 import static movies.model.Schema.USER_ENTITY_TABLE_NAME;
@@ -13,8 +13,7 @@ import static movies.model.Schema.USER_ENTITY_TABLE_NAME;
 public class NewUserListenerOnMovies implements EventListener<NewUserEvent> {
     @Override
     public void update(EntityManager em, NewUserEvent info) {
-        Session session = em.unwrap(Session.class);
-        session.doWork(conn -> {
+        em.<Connection>runWithConnection(conn -> {
             //cannot use EntityManager here, it comes from the Context of another module
             //we don't share entities between modules
             final PreparedStatement st = conn.prepareStatement(

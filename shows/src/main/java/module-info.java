@@ -5,6 +5,7 @@ module shows {
     requires jakarta.persistence;
     requires lombok;
     requires org.hibernate.orm.core;
+    requires java.sql;
     opens shows.model to org.hibernate.orm.core;
 
     exports shows.api;
