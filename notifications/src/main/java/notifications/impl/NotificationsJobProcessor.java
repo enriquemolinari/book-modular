@@ -5,19 +5,17 @@ import jakarta.persistence.EntityManagerFactory;
 import java.util.HashSet;
 
 public class NotificationsJobProcessor {
-    private final JpaSession jpaSession;
     private final EntityManagerFactory emf;
     private final NotificationSender notificationSender;
 
     public NotificationsJobProcessor(EntityManagerFactory emf,
                                      NotificationSender notificationSender) {
-        this.jpaSession = new JpaSession(emf);
         this.emf = emf;
         this.notificationSender = notificationSender;
     }
 
     public void processAll() {
-        var allJobs = jpaSession.inSession((em) -> new AllJobsRetriever(em).getAllJobs());
+        var allJobs = emf.callInTransaction((em) -> new AllJobsRetriever(em).getAllJobs());
         allJobs.forEach(
                 (job) -> {
                     emf.runInTransaction(em -> {
